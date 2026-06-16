@@ -26,6 +26,7 @@ export async function loadAllAidRecords(): Promise<AidRecord[]> {
       name: row.name,
       provider: row.provider,
       type: row.type,
+      selectivity: row.selectivity,
       award: JSON.parse(row.award),
       deadline: JSON.parse(row.deadline),
       applyUrl: row.applyUrl ?? undefined,
