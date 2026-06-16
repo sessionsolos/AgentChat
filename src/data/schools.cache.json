@@ -1,0 +1,167 @@
+[
+  {
+    "id": "181464",
+    "name": "University of Nebraska–Lincoln",
+    "city": "Lincoln",
+    "state": "NE",
+    "control": "public",
+    "tuitionInState": 10434,
+    "tuitionOutOfState": 28584,
+    "netPriceByIncome": {
+      "0-30k": 12216,
+      "30-48k": 13508,
+      "48-75k": 16197,
+      "75-110k": 19663,
+      "110k+": 20947
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS — aggregated via The College Monk & search data 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?181464-University-of-Nebraska-Lincoln=",
+      "lastVerifiedAt": "2026-06-16"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "181394",
+    "name": "University of Nebraska at Omaha",
+    "city": "Omaha",
+    "state": "NE",
+    "control": "public",
+    "tuitionInState": 8718,
+    "tuitionOutOfState": 23206,
+    "netPriceByIncome": {
+      "0-30k": 10490,
+      "30-48k": 11460,
+      "48-75k": 13833,
+      "75-110k": 17400,
+      "110k+": 19823
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS — aggregated via DecideMyCampus & search data 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?181394-University-of-Nebraska-at-Omaha=",
+      "lastVerifiedAt": "2026-06-16"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "181215",
+    "name": "University of Nebraska at Kearney",
+    "city": "Kearney",
+    "state": "NE",
+    "control": "public",
+    "tuitionInState": 8564,
+    "tuitionOutOfState": 16484,
+    "netPriceByIncome": {
+      "0-30k": 13078,
+      "30-48k": 13417
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS — aggregated via College Simply & search data 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?181215-University-of-Nebraska-at-Kearney=",
+      "lastVerifiedAt": "2026-06-16"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "181002",
+    "name": "Creighton University",
+    "city": "Omaha",
+    "state": "NE",
+    "control": "private",
+    "tuitionInState": 48856,
+    "tuitionOutOfState": 48856,
+    "netPriceByIncome": {
+      "0-30k": 22534,
+      "110k+": 38624
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS — aggregated via TuitionTracker & search data 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?181002-Creighton-University=",
+      "lastVerifiedAt": "2026-06-16"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "153658",
+    "name": "University of Iowa",
+    "city": "Iowa City",
+    "state": "IA",
+    "control": "public",
+    "tuitionInState": 11283,
+    "tuitionOutOfState": 33371,
+    "netPriceByIncome": {},
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS — tuition from IPEDS 2024-25; net price by income not verified at bracket level",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?153658-University-of-Iowa=",
+      "lastVerifiedAt": "2026-06-16"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "155317",
+    "name": "University of Kansas",
+    "city": "Lawrence",
+    "state": "KS",
+    "control": "public",
+    "tuitionInState": 12102,
+    "tuitionOutOfState": 30432,
+    "netPriceByIncome": {
+      "0-30k": 10908,
+      "30-48k": 12702,
+      "48-75k": 16097,
+      "75-110k": 20649,
+      "110k+": 21310
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS — aggregated via EDsmart & search data 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?155317-University-of-Kansas=",
+      "lastVerifiedAt": "2026-06-16"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "178396",
+    "name": "University of Missouri–Columbia",
+    "city": "Columbia",
+    "state": "MO",
+    "control": "public",
+    "tuitionInState": 14837,
+    "tuitionOutOfState": 36056,
+    "netPriceByIncome": {
+      "0-30k": 13599
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS — tuition from IPEDS 2024-25; net price partial via search data 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?178396-University-of-Missouri-Columbia=",
+      "lastVerifiedAt": "2026-06-16"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "219356",
+    "name": "South Dakota State University",
+    "city": "Brookings",
+    "state": "SD",
+    "control": "public",
+    "tuitionInState": 9299,
+    "tuitionOutOfState": 12809,
+    "netPriceByIncome": {
+      "0-30k": 14110,
+      "110k+": 22599
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS — aggregated via College Simply & search data 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?219356-South-Dakota-State-University=",
+      "lastVerifiedAt": "2026-06-16"
+    },
+    "dataSource": "cached"
+  }
+]

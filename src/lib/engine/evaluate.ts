@@ -133,6 +133,16 @@ function nodePassesHard(
       // Leaf: hard leaf must be met; soft leaf always passes the hard gate.
       const leaf = rule as LeafPredicate;
       if (leaf.weight !== "hard") return true;
+      // Special case: ethnicityIn with absent/empty tags is treated as an
+      // unknown soft gap, NOT a hard exclusion (student hasn't stated heritage).
+      if (leaf.kind === "ethnicityIn") {
+        const tags = profile.demographics?.ethnicityTags;
+        if (!tags || tags.length === 0) {
+          // Tags absent → cannot hard-exclude; treat as passing the hard gate
+          // (will show up as soft gap in the leaf result).
+          return true;
+        }
+      }
       return leafMet(leaf, profile);
     }
   }
@@ -176,6 +186,15 @@ function leafMet(leaf: LeafPredicate, profile: StudentProfile): boolean {
     case "deadlineAfter": {
       const today = new Date().toISOString().slice(0, 10);
       return today <= leaf.date;
+    }
+    case "ethnicityIn": {
+      const tags = profile.demographics?.ethnicityTags;
+      if (!tags || tags.length === 0) {
+        // Unknown heritage — don't hard-exclude, but not considered "met"
+        return false;
+      }
+      const tagsLower = tags.map((t) => t.toLowerCase());
+      return leaf.values.some((v) => tagsLower.includes(v.toLowerCase()));
     }
   }
 }
@@ -293,6 +312,8 @@ function negatedDescription(lr: LeafResult): string {
       return `Not restricted to students with ${leaf.test.toUpperCase()} ≥ ${leaf.value}`;
     case "deadlineAfter":
       return `Not restricted by the ${leaf.date} deadline`;
+    case "ethnicityIn":
+      return `Not restricted to ${leaf.values.join("/")} heritage applicants`;
     default:
       return lr.description;
   }
@@ -452,6 +473,35 @@ function evaluateLeaf(
         description: met
           ? `Deadline is open (${leaf.date}; ${daysUntil} days away)`
           : `Deadline has passed (${leaf.date})`,
+      };
+    }
+
+    case "ethnicityIn": {
+      const tags = profile.demographics?.ethnicityTags;
+      const tagsAbsent = !tags || tags.length === 0;
+
+      if (tagsAbsent) {
+        // Student hasn't provided ethnicity — unknown heritage.
+        // Per brief: keep the award but mark as a soft gap (required=false),
+        // regardless of whether the leaf weight is "hard".
+        // The score dampening is applied separately in score.ts.
+        return {
+          leaf,
+          met: false,
+          required: false, // never hard-exclude when heritage is unstated
+          description: `Typically requires ${leaf.values.join(" or ")} heritage — confirm you qualify`,
+        };
+      }
+
+      const tagsLower = tags.map((t) => t.toLowerCase());
+      const met = leaf.values.some((v) => tagsLower.includes(v.toLowerCase()));
+      return {
+        leaf,
+        met,
+        required: isHard && parentRequired && met === false,
+        description: met
+          ? `Heritage requirement met (you indicated: ${tags.join(", ")})`
+          : `Heritage requirement not met (requires: ${leaf.values.join(" or ")}; you indicated: ${tags.join(", ")})`,
       };
     }
   }

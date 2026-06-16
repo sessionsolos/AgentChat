@@ -7,3 +7,4 @@ export * from "./student-profile";
 export * from "./eligibility";
 export * from "./aid-record";
 export * from "./match-result";
+export * from "./school-cost";

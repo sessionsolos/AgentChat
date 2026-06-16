@@ -86,6 +86,23 @@ export const DeadlineAfterLeafSchema = z.object({
   weight: WeightSchema,
 });
 
+/**
+ * Heritage/identity eligibility leaf.
+ *
+ * Canonical heritage tags (lowercase): hispanic, black, asian, native_american,
+ * pacific_islander, white, middle_eastern, multiracial.
+ *
+ * Evaluation semantics (see evaluate.ts):
+ *   hard + ethnicityTags provided + none match → excluded (not obtainable)
+ *   hard + ethnicityTags absent/empty          → soft gap (award kept, score dampened, note added)
+ *   soft + any mismatch                        → soft gap only (score dampened)
+ */
+export const EthnicityInLeafSchema = z.object({
+  kind: z.literal("ethnicityIn"),
+  values: z.array(z.string()),
+  weight: WeightSchema,
+});
+
 /** Union of all leaf predicate schemas */
 export const LeafPredicateSchema = z.discriminatedUnion("kind", [
   GpaAtLeastLeafSchema,
@@ -97,9 +114,11 @@ export const LeafPredicateSchema = z.discriminatedUnion("kind", [
   HasActivityLeafSchema,
   CitizenshipInLeafSchema,
   DeadlineAfterLeafSchema,
+  EthnicityInLeafSchema,
 ]);
 
 export type LeafPredicate = z.infer<typeof LeafPredicateSchema>;
+export type EthnicityInLeaf = z.infer<typeof EthnicityInLeafSchema>;
 
 // ---------------------------------------------------------------------------
 // Composite nodes (recursive via z.lazy)

@@ -27,7 +27,14 @@ import type { StudentProfile } from "@/lib/schemas/student-profile";
 import { evaluate, isObtainable } from "./evaluate";
 import { computeScore } from "./score";
 import { buildExplanations } from "./explain";
-import { STRONG_THRESHOLD, POSSIBLE_THRESHOLD } from "./weights";
+import {
+  STRONG_THRESHOLD,
+  POSSIBLE_THRESHOLD,
+  HIGHLY_SELECTIVE_BAND_CAP,
+  EXCEPTIONAL_GPA_FLOOR,
+  EXCEPTIONAL_SAT_FLOOR,
+  EXCEPTIONAL_ACT_FLOOR,
+} from "./weights";
 
 // ---------------------------------------------------------------------------
 // matchProfile — the single exported entry point
@@ -70,9 +77,10 @@ export function matchProfile(
     const feasibilityScore = computeScore(leaves, profile, aid);
 
     // -----------------------------------------------------------------------
-    // Step 4: band
+    // Step 4: band (with selectivity cap for highly_selective awards)
     // -----------------------------------------------------------------------
-    const band: FeasibilityBand = scoreToBand(feasibilityScore);
+    const rawBand: FeasibilityBand = scoreToBand(feasibilityScore);
+    const band: FeasibilityBand = applySelectivityCap(rawBand, aid, profile);
 
     // -----------------------------------------------------------------------
     // Step 5: explanations

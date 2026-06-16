@@ -78,6 +78,36 @@ export const AidTypeSchema = z.enum([
 export type AidType = z.infer<typeof AidTypeSchema>;
 
 // ---------------------------------------------------------------------------
+// Selectivity — how competitive an award is nationally
+// ---------------------------------------------------------------------------
+
+/**
+ * Selectivity tier for an award.
+ *
+ *   highly_selective — nationally competitive, elite awards (Davidson Fellows,
+ *                       Mensa, National Merit, Regeneron STS, Coca-Cola, Jack
+ *                       Kent Cooke, QuestBridge, Ron Brown, Equitable Excellence,
+ *                       Elks MVS, Dell).  A typical solid applicant should land
+ *                       at most "possible", not "strong".
+ *   competitive      — meaningful selection process but broader eligibility
+ *                       (Horatio Alger, NHS, SWE, DoD SMART, TEACH, TYLENOL,
+ *                       USTA Foundation, FFA, Burger King, ACS Scholars, DAR, etc.)
+ *   open             — need-/residency-based programs where meeting hard criteria
+ *                       means you are awarded; no competitive ranking
+ *                       (Federal Pell Grant, Nebraska Opportunity Grant, Nebraska
+ *                        Promise, ACE, Nebraska Career Scholarship, Susan Buffett,
+ *                        Scholastic Art & Writing, Nebraska Farm Bureau).
+ *
+ * Defaults to "competitive" when absent (schema uses .default()).
+ */
+export const SelectivitySchema = z.enum([
+  "open",
+  "competitive",
+  "highly_selective",
+]);
+export type Selectivity = z.infer<typeof SelectivitySchema>;
+
+// ---------------------------------------------------------------------------
 // Citation — embedded in MatchResult; derived from provenance fields
 // ---------------------------------------------------------------------------
 
@@ -116,6 +146,13 @@ export const AidRecordSchema = z.object({
   scope: ScopeSchema,
   tags: TagsSchema,
   eligibility: EligibilityRuleSetSchema,
+
+  /**
+   * Selectivity tier — how competitive this award is.
+   * Defaults to "competitive" when omitted from source data.
+   * Used by the engine to cap feasibility bands for elite awards.
+   */
+  selectivity: SelectivitySchema.default("competitive"),
 });
 
 export type AidRecord = z.infer<typeof AidRecordSchema>;

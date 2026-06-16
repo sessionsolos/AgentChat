@@ -5,11 +5,14 @@ import {
   StudentProfileSchema,
   type StudentProfile,
   type MatchResponse,
+  type IncomeBand,
+  type SchoolsResponse,
 } from "@/lib/schemas";
 import { FormSection, FullWidthField } from "./FormSection";
 import { TagInput, type QuickAddItem } from "./TagInput";
 import { FieldError } from "./FieldError";
 import { ResultsPanel } from "./ResultsPanel";
+import { SchoolCostPanel } from "./SchoolCostPanel";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -75,6 +78,22 @@ const QUICK_ADD_MAJORS = [
   "Art & Design",
   "Pre-Med",
   "Social Work",
+];
+
+/**
+ * Canonical ethnicity values — must stay in sync with the scholarship
+ * eligibility rules. Displayed with friendly labels; stored as canonical
+ * lowercase strings in demographics.ethnicityTags.
+ */
+const ETHNICITY_OPTIONS: QuickAddItem[] = [
+  { label: "Hispanic / Latino", value: "hispanic" },
+  { label: "Black / African American", value: "black" },
+  { label: "Asian / Asian American", value: "asian" },
+  { label: "Native American / Alaska Native", value: "native_american" },
+  { label: "Pacific Islander", value: "pacific_islander" },
+  { label: "White", value: "white" },
+  { label: "Middle Eastern / North African", value: "middle_eastern" },
+  { label: "Multiracial", value: "multiracial" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -256,6 +275,14 @@ export function ProfileForm() {
     | { status: "error"; message: string }
   >({ status: "idle" });
 
+  // Schools cost comparison state — fires in parallel with /api/match
+  const [schoolsState, setSchoolsState] = useState<
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "success"; data: SchoolsResponse; homeState: string; incomeBand: IncomeBand | undefined }
+    | { status: "error"; message: string }
+  >({ status: "idle" });
+
   const set = (key: keyof FormState) => (value: FormState[typeof key]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -283,38 +310,79 @@ export function ProfileForm() {
     const profile: StudentProfile = parsed.data;
 
     setApiState({ status: "loading" });
+    setSchoolsState({ status: "loading" });
 
-    try {
-      const res = await fetch("/api/match", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile }),
+    // Fire both requests in parallel
+    const matchPromise = fetch("/api/match", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ profile }),
+    });
+
+    const schoolsPromise = fetch("/api/schools", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        state: profile.homeState,
+        incomeBand: profile.householdIncomeBand,
+        majors: profile.intendedMajors,
+        includeOutOfState: true,
+      }),
+    });
+
+    // Handle /api/match response
+    matchPromise
+      .then(async (res) => {
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          const msg =
+            (body as { error?: string }).error ??
+            `Server error (${res.status}). Please try again.`;
+          setApiState({ status: "error", message: msg });
+          return;
+        }
+        const data = (await res.json()) as MatchResponse;
+        setApiState({ status: "success", data });
+
+        // Scroll to results once match data is ready
+        setTimeout(() => {
+          document
+            .getElementById("results-section")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      })
+      .catch(() => {
+        setApiState({
+          status: "error",
+          message: "Network error — please check your connection and try again.",
+        });
       });
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        const msg =
-          (body as { error?: string }).error ??
-          `Server error (${res.status}). Please try again.`;
-        setApiState({ status: "error", message: msg });
-        return;
-      }
-
-      const data = (await res.json()) as MatchResponse;
-      setApiState({ status: "success", data });
-
-      // Scroll to results
-      setTimeout(() => {
-        document
-          .getElementById("results-section")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
-    } catch {
-      setApiState({
-        status: "error",
-        message: "Network error — please check your connection and try again.",
+    // Handle /api/schools response
+    schoolsPromise
+      .then(async (res) => {
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          const msg =
+            (body as { error?: string }).error ??
+            `Could not load school cost data (${res.status}).`;
+          setSchoolsState({ status: "error", message: msg });
+          return;
+        }
+        const data = (await res.json()) as SchoolsResponse;
+        setSchoolsState({
+          status: "success",
+          data,
+          homeState: profile.homeState,
+          incomeBand: profile.householdIncomeBand,
+        });
+      })
+      .catch(() => {
+        setSchoolsState({
+          status: "error",
+          message: "Network error loading school costs — please try again.",
+        });
       });
-    }
   };
 
   const isLoading = apiState.status === "loading";
@@ -330,7 +398,7 @@ export function ProfileForm() {
         {/* ── Academic Background ── */}
         <FormSection
           title="Academic Background"
-          description="Basic academic information used to match scholarship criteria."
+          description="Your current grade and academics — used to find scholarships you can apply for now or start preparing for."
         >
           {/* Grade Level */}
           <div>
@@ -344,22 +412,22 @@ export function ProfileForm() {
               aria-describedby={err("gradeLevel") ? "gradeLevel-error" : undefined}
             >
               <option value="">Select grade level…</option>
-              <option value="sophomore">Sophomore (10th)</option>
-              <option value="junior">Junior (11th)</option>
-              <option value="senior">Senior (12th)</option>
+              <option value="sophomore">Sophomore (10th grade)</option>
+              <option value="junior">Junior (11th grade)</option>
+              <option value="senior">Senior (12th grade)</option>
             </select>
             <FieldError id="gradeLevel-error" message={err("gradeLevel")} />
           </div>
 
           {/* Grad Year */}
           <div>
-            <Label htmlFor="gradYear">Expected Graduation Year</Label>
+            <Label htmlFor="gradYear">Expected High School Graduation Year</Label>
             <input
               id="gradYear"
               type="number"
               min={2020}
               max={2040}
-              placeholder="e.g. 2026"
+              placeholder="e.g. 2027"
               value={form.gradYear}
               onChange={setStr("gradYear")}
               className={inputCls(!!err("gradYear"))}
@@ -584,7 +652,7 @@ export function ProfileForm() {
         {/* ── Activities & Achievements ── */}
         <FormSection
           title="Activities & Achievements"
-          description="Clubs, sports, volunteer work, honors. Use the quick-add chips or type your own."
+          description="Clubs, sports, volunteer work, honors — past or current. Use the quick-add chips or type your own."
         >
           <FullWidthField>
             <TagInput
@@ -602,7 +670,7 @@ export function ProfileForm() {
         {/* ── Optional Demographics ── */}
         <FormSection
           title="Additional Information"
-          description="Optional. Helps match scholarships targeted to specific groups."
+          description="All fields below are optional and help surface scholarships you may qualify for."
         >
           {/* First Gen */}
           <div className="sm:col-span-2 flex items-center gap-3">
@@ -663,27 +731,48 @@ export function ProfileForm() {
             </p>
           </div>
 
-          {/* Ethnicity Tags */}
+          {/* Ethnicity Tags — canonical multi-select */}
           <FullWidthField>
-            <TagInput
-              id="ethnicityTags"
-              label="Racial / Ethnic Identity"
-              values={form.ethnicityTags}
-              onChange={set("ethnicityTags") as (v: string[]) => void}
-              placeholder="e.g. Hispanic, Asian American…"
-              quickAdd={[
-                "Hispanic / Latino",
-                "Black / African American",
-                "Asian American",
-                "Native American",
-                "Pacific Islander",
-                "White",
-                "Multi-racial",
-              ]}
-            />
-            <p className="mt-1 text-xs text-gray-400">
-              Some scholarships are targeted to specific communities.
-            </p>
+            <div>
+              <p className="block text-sm font-medium text-gray-700 mb-1">
+                Background{" "}
+                <span className="text-xs font-normal text-gray-400">
+                  (optional)
+                </span>
+              </p>
+              <p className="text-xs text-gray-500 mb-2">
+                Only used to surface scholarships you may be eligible for.
+                Stored only in your browser — never sent anywhere except to find
+                your matches.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {ETHNICITY_OPTIONS.map((opt) => {
+                  const val = typeof opt === "string" ? opt : opt.value;
+                  const label = typeof opt === "string" ? opt : opt.label;
+                  const selected = form.ethnicityTags.includes(val);
+                  return (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => {
+                        const next = selected
+                          ? form.ethnicityTags.filter((t) => t !== val)
+                          : [...form.ethnicityTags, val];
+                        setForm((prev) => ({ ...prev, ethnicityTags: next }));
+                      }}
+                      aria-pressed={selected}
+                      className={`text-sm px-3 py-1.5 rounded-full border transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                        selected
+                          ? "bg-blue-700 text-white border-blue-700 font-medium"
+                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </FullWidthField>
         </FormSection>
 

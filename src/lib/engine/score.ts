@@ -30,6 +30,8 @@ import {
   SAT_MARGIN_FULL,
   ACT_MARGIN_FULL,
   HIGH_AWARD_THRESHOLD,
+  SELECTIVITY_MULTIPLIER,
+  ETHNICITY_UNKNOWN_PENALTY,
 } from "./weights";
 
 // ---------------------------------------------------------------------------
@@ -56,6 +58,14 @@ function incomeBandIndex(band: IncomeBand): number {
 /**
  * Compute a 0–100 feasibility score from the leaf evaluation results.
  *
+ * The score has three phases:
+ *   1. Raw weighted combination of eligibility margin + soft fit + competitiveness.
+ *   2. Selectivity multiplier — reduces the score for more selective awards so
+ *      they fall into lower bands for typical applicants.
+ *   3. Ethnicity-unknown penalty — if any ethnicityIn leaf is present but the
+ *      student did not provide ethnicityTags, apply an additional dampener so
+ *      the award cannot sit at the top of results.
+ *
  * @param leaves  - All leaf results from the recursive evaluator.
  * @param profile - The student profile (needed for margin calculations).
  * @param aid     - The AidRecord (needed for competitiveness signal).
@@ -75,8 +85,26 @@ export function computeScore(
     softScore * WEIGHT_SOFT_FIT +
     compScore * WEIGHT_COMPETITIVENESS;
 
+  // Phase 2: selectivity multiplier
+  const selectivity = aid.selectivity ?? "competitive";
+  const selectivityMult = SELECTIVITY_MULTIPLIER[selectivity] ?? 1.0;
+  const afterSelectivity = raw * selectivityMult;
+
+  // Phase 3: ethnicity-unknown penalty
+  // Applied when there are ethnicityIn leaves present AND the student has not
+  // provided ethnicityTags (leaves are unmet but not required).
+  const hasEthnicityLeaf = leaves.some((lr) => lr.leaf.kind === "ethnicityIn");
+  const ethnicityTagsAbsent =
+    !profile.demographics?.ethnicityTags ||
+    profile.demographics.ethnicityTags.length === 0;
+  const ethnicityGap = hasEthnicityLeaf && ethnicityTagsAbsent;
+
+  const afterEthnicity = ethnicityGap
+    ? afterSelectivity * ETHNICITY_UNKNOWN_PENALTY
+    : afterSelectivity;
+
   // Clamp to [0, 100] and round to one decimal.
-  return Math.round(Math.min(100, Math.max(0, raw)) * 10) / 10;
+  return Math.round(Math.min(100, Math.max(0, afterEthnicity)) * 10) / 10;
 }
 
 // ---------------------------------------------------------------------------
@@ -144,6 +172,7 @@ function leafMargin(leaf: LeafPredicate, profile: StudentProfile): number {
     case "majorIn":
     case "hasActivity":
     case "deadlineAfter":
+    case "ethnicityIn":
       return 1.0;
   }
 }
