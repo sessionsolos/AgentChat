@@ -1,6 +1,144 @@
 [
   {
-    "id": "example-gates-millennium-2025",
+    "id": "coca-cola-scholars-2026",
+    "name": "Coca-Cola Scholars Program",
+    "provider": "Coca-Cola Scholars Foundation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 20000,
+      "amountMax": 20000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-09-30"
+    },
+    "applyUrl": "https://www.coca-colascholarsfoundation.org/apply/",
+    "sourceUrl": "https://www.coca-colascholarsfoundation.org/apply/",
+    "sourceName": "Coca-Cola Scholars Foundation Official Site",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.0,
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "horatio-alger-national-2026",
+    "name": "Horatio Alger National Scholarship",
+    "provider": "Horatio Alger Association",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 25000,
+      "amountMax": 25000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-10-01"
+    },
+    "applyUrl": "https://scholars.horatioalger.org/scholarships/",
+    "sourceUrl": "https://scholars.horatioalger.org/undergraduate-applicant-faq/",
+    "sourceName": "Horatio Alger Association — Undergraduate Applicant FAQ",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 2.0,
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "48-75k",
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "elks-mvs-2026",
+    "name": "Elks Most Valuable Student Scholarship",
+    "provider": "Elks National Foundation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 4000,
+      "amountMax": 30000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-01-31"
+    },
+    "applyUrl": "https://www.elks.org/scholars/scholarships/mvs.cfm",
+    "sourceUrl": "https://www.elks.org/scholars/scholarships/mvs.cfm",
+    "sourceName": "Elks National Foundation — Most Valuable Student Scholarship",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "gates-millennium-scholars-2026",
     "name": "Gates Millennium Scholars Program",
     "provider": "Bill & Melinda Gates Foundation",
     "type": "scholarship",
@@ -11,12 +149,12 @@
     },
     "deadline": {
       "type": "date",
-      "date": "2025-01-15"
+      "date": "2027-01-13"
     },
-    "applyUrl": "https://www.gmsp.org/",
-    "sourceUrl": "https://www.gmsp.org/",
-    "sourceName": "Gates Millennium Scholars Program Official Site",
-    "lastVerifiedAt": "2025-01-01",
+    "applyUrl": "https://gmsp.org/",
+    "sourceUrl": "https://gmsp.org/a-faqs/",
+    "sourceName": "Gates Millennium Scholars Program — FAQs",
+    "lastVerifiedAt": "2026-06-16",
     "scope": {
       "level": "national"
     },
@@ -54,13 +192,1489 @@
           "kind": "incomeBandAtMost",
           "band": "48-75k",
           "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "federal-pell-grant-2026",
+    "name": "Federal Pell Grant",
+    "provider": "U.S. Department of Education",
+    "type": "grant",
+    "award": {
+      "amountMin": 750,
+      "amountMax": 7395,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "rolling"
+    },
+    "applyUrl": "https://studentaid.gov/h/apply-for-aid/fafsa",
+    "sourceUrl": "https://studentaid.gov/understand-aid/types/grants/pell",
+    "sourceName": "Federal Student Aid — Pell Grant",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
         },
         {
-          "kind": "any",
-          "rules": [
-            { "kind": "majorIn", "values": ["Computer Science", "Engineering", "Mathematics", "Science"], "weight": "soft" },
-            { "kind": "majorIn", "values": ["Education", "Library Science", "Public Health"], "weight": "soft" }
-          ]
+          "kind": "incomeBandAtMost",
+          "band": "48-75k",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "national-merit-scholarship-2026",
+    "name": "National Merit Scholarship Program",
+    "provider": "National Merit Scholarship Corporation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 2500,
+      "amountMax": 2500,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-10-15"
+    },
+    "applyUrl": "https://www.nationalmerit.org/",
+    "sourceUrl": "https://www.nationalmerit.org/s/1758/interior.aspx?sid=1758&gid=2&pgid=1876",
+    "sourceName": "National Merit Scholarship Corporation — Entry Requirements",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "testAtLeast",
+          "test": "sat",
+          "value": 1400,
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "nhs-scholarship-2026",
+    "name": "National Honor Society Scholarship",
+    "provider": "National Association of Secondary School Principals (NASSP)",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 1000,
+      "amountMax": 13000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-11-20"
+    },
+    "applyUrl": "https://www.nationalhonorsociety.org/the-nhs-scholarship/",
+    "sourceUrl": "https://www.nationalhonorsociety.org/the-nhs-scholarship/",
+    "sourceName": "National Honor Society — The NHS Scholarship",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": ["nhs"]
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "hasActivity",
+          "tag": "nhs",
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.0,
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "susan-buffett-scholarship-2026",
+    "name": "Susan Thompson Buffett Foundation Scholarship",
+    "provider": "Susan Thompson Buffett Foundation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 9750,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-02-01"
+    },
+    "applyUrl": "https://buffettscholarships.org/",
+    "sourceUrl": "https://buffettscholarships.org/eligibility-selection",
+    "sourceName": "Susan Thompson Buffett Foundation — Eligibility & Selection",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "state",
+      "state": "NE"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "residencyState",
+          "state": "NE",
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 2.0,
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "48-75k",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "nebraska-opportunity-grant-2026",
+    "name": "Nebraska Opportunity Grant",
+    "provider": "Nebraska Coordinating Commission for Postsecondary Education",
+    "type": "grant",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 4000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "rolling"
+    },
+    "applyUrl": "https://ccpe.nebraska.gov/nebraska-opportunity-grant-nog",
+    "sourceUrl": "https://ccpe.nebraska.gov/nebraska-opportunity-grant-nog",
+    "sourceName": "Nebraska CCPE — Nebraska Opportunity Grant",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "state",
+      "state": "NE"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "residencyState",
+          "state": "NE",
+          "weight": "hard"
+        },
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "48-75k",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "nebraska-promise-2026",
+    "name": "Nebraska Promise",
+    "provider": "University of Nebraska System",
+    "type": "grant",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 12000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-05-01"
+    },
+    "applyUrl": "https://nebraska.edu/nebraska-promise/",
+    "sourceUrl": "https://nebraska.edu/nebraska-promise/",
+    "sourceName": "University of Nebraska — Nebraska Promise",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "state",
+      "state": "NE"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "residencyState",
+          "state": "NE",
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "48-75k",
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 2.5,
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "nebraska-ace-scholarship-2026",
+    "name": "Access College Early (ACE) Scholarship Program",
+    "provider": "Nebraska Coordinating Commission for Postsecondary Education",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 5000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-12-15"
+    },
+    "applyUrl": "https://ccpe.nebraska.gov/access-college-early-ace-scholarship-program",
+    "sourceUrl": "https://ccpe.nebraska.gov/access-college-early-ace-scholarship-program",
+    "sourceName": "Nebraska CCPE — Access College Early (ACE) Scholarship Program",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "state",
+      "state": "NE"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "residencyState",
+          "state": "NE",
+          "weight": "hard"
+        },
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["sophomore", "junior", "senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "30-48k",
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "nebraska-career-scholarship-2026",
+    "name": "Nebraska Career Scholarship Program",
+    "provider": "Nebraska Coordinating Commission for Postsecondary Education",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 5000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-09-01"
+    },
+    "applyUrl": "https://ccpe.nebraska.gov/ne-career-scholarship-community-colleges",
+    "sourceUrl": "https://ccpe.nebraska.gov/ne-career-scholarship-community-colleges",
+    "sourceName": "Nebraska CCPE — Nebraska Career Scholarship at Community Colleges",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "state",
+      "state": "NE"
+    },
+    "tags": {
+      "majors": [
+        "Nursing",
+        "Healthcare",
+        "Information Technology",
+        "Manufacturing",
+        "Welding",
+        "Automotive Technology"
+      ],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "residencyState",
+          "state": "NE",
+          "weight": "hard"
+        },
+        {
+          "kind": "majorIn",
+          "values": [
+            "Nursing",
+            "Healthcare",
+            "Information Technology",
+            "Manufacturing",
+            "Welding",
+            "Automotive Technology"
+          ],
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "questbridge-ncm-2026",
+    "name": "QuestBridge National College Match Scholarship",
+    "provider": "QuestBridge",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 220000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-09-30"
+    },
+    "applyUrl": "https://www.questbridge.org/apply-to-college/programs/national-college-match",
+    "sourceUrl": "https://www.questbridge.org/apply-to-college/programs/national-college-match",
+    "sourceName": "QuestBridge — National College Match",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "48-75k",
+          "weight": "soft"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.5,
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "dell-scholars-2026",
+    "name": "Dell Scholars Program",
+    "provider": "Michael & Susan Dell Foundation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 20000,
+      "amountMax": 20000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-02-15"
+    },
+    "applyUrl": "https://www.dellscholars.org/scholarship/",
+    "sourceUrl": "https://scholarships360.org/scholarships/search/dell-scholars-program/",
+    "sourceName": "Scholarships360 — Dell Scholars Program",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 2.4,
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "48-75k",
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "jack-kent-cooke-college-2026",
+    "name": "Jack Kent Cooke College Scholarship",
+    "provider": "Jack Kent Cooke Foundation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 55000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-11-01"
+    },
+    "applyUrl": "https://www.jkcf.org/our-scholarships/",
+    "sourceUrl": "https://www.jkcf.org/our-scholarships/",
+    "sourceName": "Jack Kent Cooke Foundation — Our Scholarships",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.75,
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "75-110k",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "acs-scholars-2026",
+    "name": "American Chemical Society (ACS) Scholars Program",
+    "provider": "American Chemical Society",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 5000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-03-01"
+    },
+    "applyUrl": "https://www.acs.org/funding/scholarships-fellowships/acs-scholars.html",
+    "sourceUrl": "https://www.acs.org/funding/scholarships-fellowships/catalyst-scholarship.html",
+    "sourceName": "American Chemical Society — ACS Scholars / Catalyst Scholarship",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "Chemistry",
+        "Biochemistry",
+        "Chemical Engineering",
+        "Chemical Technology"
+      ],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior", "junior", "sophomore"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.0,
+          "weight": "hard"
+        },
+        {
+          "kind": "majorIn",
+          "values": [
+            "Chemistry",
+            "Biochemistry",
+            "Chemical Engineering",
+            "Chemical Technology"
+          ],
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "75-110k",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "swe-emerging-scholars-2026",
+    "name": "SWE Emerging First Year Scholarship",
+    "provider": "Society of Women Engineers",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 1000,
+      "amountMax": 15000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-03-31"
+    },
+    "applyUrl": "https://swe.org/apply-for-a-swe-scholarship/",
+    "sourceUrl": "https://swe.org/apply-for-a-swe-scholarship/",
+    "sourceName": "Society of Women Engineers — Apply for a SWE Scholarship",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "Engineering",
+        "Computer Science"
+      ],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.5,
+          "weight": "hard"
+        },
+        {
+          "kind": "majorIn",
+          "values": [
+            "Engineering",
+            "Computer Science"
+          ],
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "dod-smart-scholarship-2026",
+    "name": "DoD SMART Scholarship for Service Program",
+    "provider": "U.S. Department of Defense",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 25000,
+      "amountMax": 38000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-12-01"
+    },
+    "applyUrl": "https://www.smartscholarship.org/smart/en",
+    "sourceUrl": "https://www.smartscholarship.org/smart/en?id=smart_eligibility",
+    "sourceName": "DoD SMART Scholarship Program — Eligibility",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "Engineering",
+        "Computer Science",
+        "Mathematics",
+        "Physics",
+        "Chemistry"
+      ],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["sophomore", "junior", "senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.0,
+          "weight": "hard"
+        },
+        {
+          "kind": "majorIn",
+          "values": [
+            "Engineering",
+            "Computer Science",
+            "Mathematics",
+            "Physics",
+            "Chemistry"
+          ],
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "teach-grant-2026",
+    "name": "TEACH Grant (Teacher Education Assistance for College and Higher Education)",
+    "provider": "U.S. Department of Education",
+    "type": "grant",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 4000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "rolling"
+    },
+    "applyUrl": "https://studentaid.gov/understand-aid/types/grants/teach",
+    "sourceUrl": "https://fsapartners.ed.gov/knowledge-center/fsa-handbook/2025-2026/vol9/ch1-eligibility-teach-grants",
+    "sourceName": "Federal Student Aid Handbook 2025-2026 — TEACH Grant Eligibility",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "Education",
+        "Mathematics Education",
+        "Science Education",
+        "Special Education"
+      ],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "majorIn",
+          "values": [
+            "Education",
+            "Mathematics Education",
+            "Science Education",
+            "Special Education"
+          ],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.25,
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "tylenol-future-care-2026",
+    "name": "TYLENOL Future Care Scholarship",
+    "provider": "Johnson & Johnson / TYLENOL",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 5000,
+      "amountMax": 10000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-07-01"
+    },
+    "applyUrl": "https://www.tylenol.com/tylenol-future-care-scholarship",
+    "sourceUrl": "https://www.tylenol.com/tylenol-future-care-scholarship",
+    "sourceName": "TYLENOL — Future Care Scholarship",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "Nursing",
+        "Medicine",
+        "Pharmacy",
+        "Healthcare"
+      ],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "majorIn",
+          "values": [
+            "Nursing",
+            "Medicine",
+            "Pharmacy",
+            "Healthcare"
+          ],
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "hispanic-scholarship-fund-2026",
+    "name": "Hispanic Scholarship Fund Scholarship",
+    "provider": "Hispanic Scholarship Fund",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 500,
+      "amountMax": 5000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-03-15"
+    },
+    "applyUrl": "https://www.hsf.net/scholarship/",
+    "sourceUrl": "https://www.hsf.net/scholarship/",
+    "sourceName": "Hispanic Scholarship Fund — Scholarship",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident", "daca"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["sophomore", "junior", "senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.0,
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "75-110k",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "equitable-excellence-2026",
+    "name": "Equitable Excellence Scholarship",
+    "provider": "Equitable Foundation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 5000,
+      "amountMax": 5000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-12-18"
+    },
+    "applyUrl": "https://equitable.com/foundation/equitable-excellence-scholarship",
+    "sourceUrl": "https://equitable.com/foundation/equitable-excellence-scholarship",
+    "sourceName": "Equitable Foundation — Equitable Excellence Scholarship",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 2.5,
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "75-110k",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "burger-king-scholars-2026",
+    "name": "Burger King Scholars Program",
+    "provider": "Burger King Foundation / Scholarship America",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 1000,
+      "amountMax": 60000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-12-15"
+    },
+    "applyUrl": "https://burgerking.scholarsapply.org/",
+    "sourceUrl": "https://scholarshipamerica.org/scholarship/burger-king-scholars-program/",
+    "sourceName": "Scholarship America — Burger King Scholars Program",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 2.0,
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "75-110k",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "ron-brown-scholar-2026",
+    "name": "Ron Brown Scholar Program",
+    "provider": "Ron Brown Scholar Program",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 40000,
+      "amountMax": 40000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-12-01"
+    },
+    "applyUrl": "https://ronbrown.org/ron-brown-scholarship/",
+    "sourceUrl": "https://ronbrown.org/ron-brown-scholarship/",
+    "sourceName": "Ron Brown Scholar Program — Scholarship",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "75-110k",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "davidson-fellows-2026",
+    "name": "Davidson Fellows Scholarship",
+    "provider": "Davidson Institute",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 25000,
+      "amountMax": 100000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-02-14"
+    },
+    "applyUrl": "https://www.davidsongifted.org/gifted-programs/fellows-scholarship/",
+    "sourceUrl": "https://www.davidsongifted.org/gifted-programs/fellows-scholarship/eligibility/",
+    "sourceName": "Davidson Institute — Fellows Scholarship Eligibility",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "Science",
+        "Engineering",
+        "Mathematics",
+        "Literature",
+        "Music",
+        "Philosophy"
+      ],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["sophomore", "junior", "senior"],
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "scholastic-art-writing-2026",
+    "name": "Scholastic Art & Writing Awards Scholarship",
+    "provider": "Alliance for Young Artists & Writers",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 12500,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-12-15"
+    },
+    "applyUrl": "https://www.artandwriting.org/awards/",
+    "sourceUrl": "https://www.artandwriting.org/awards/",
+    "sourceName": "Alliance for Young Artists & Writers — The Awards",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "Art",
+        "Creative Writing",
+        "Graphic Design"
+      ],
+      "activities": ["art", "creative-writing"]
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["sophomore", "junior", "senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "hasActivity",
+          "tag": "art",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "regeneron-sts-2026",
+    "name": "Regeneron Science Talent Search",
+    "provider": "Society for Science / Regeneron",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 25000,
+      "amountMax": 250000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-11-06"
+    },
+    "applyUrl": "https://www.societyforscience.org/regeneron-sts/",
+    "sourceUrl": "https://www.societyforscience.org/regeneron-sts/application-requirements/",
+    "sourceName": "Society for Science — Regeneron STS Application Requirements",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "Science",
+        "Engineering",
+        "Mathematics"
+      ],
+      "activities": ["science-research"]
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "hasActivity",
+          "tag": "science-research",
+          "weight": "soft"
+        },
+        {
+          "kind": "majorIn",
+          "values": [
+            "Science",
+            "Engineering",
+            "Mathematics"
+          ],
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "usta-foundation-scholarship-2026",
+    "name": "USTA Foundation College Scholarship",
+    "provider": "USTA Foundation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 6000,
+      "amountMax": 6000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-12-31"
+    },
+    "applyUrl": "https://www.ustafoundation.com/en/home/what-we-do/college-scholarship-opportunities.html",
+    "sourceUrl": "https://www.ustafoundation.com/en/home/what-we-do/college-scholarship-opportunities.html",
+    "sourceName": "USTA Foundation — College Scholarship Opportunities",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": ["athletics:tennis", "tennis"]
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "hasActivity",
+          "tag": "tennis",
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "75-110k",
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "ffa-national-scholarship-2026",
+    "name": "National FFA Scholarship Program",
+    "provider": "National FFA Organization",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 1000,
+      "amountMax": 10000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-01-07"
+    },
+    "applyUrl": "https://www.ffa.org/participate/scholarships/",
+    "sourceUrl": "https://scholarships360.org/scholarships/search/national-ffa-scholarship-program/",
+    "sourceName": "Scholarships360 — National FFA Scholarship Program",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "Agriculture",
+        "Agribusiness",
+        "Environmental Science"
+      ],
+      "activities": ["ffa"]
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["sophomore", "junior", "senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "hasActivity",
+          "tag": "ffa",
+          "weight": "hard"
+        },
+        {
+          "kind": "majorIn",
+          "values": [
+            "Agriculture",
+            "Agribusiness",
+            "Environmental Science"
+          ],
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "american-legion-aux-spirit-youth-2026",
+    "name": "American Legion Auxiliary Spirit of Youth Scholarship",
+    "provider": "American Legion Auxiliary",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 5000,
+      "amountMax": 5000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-03-01"
+    },
+    "applyUrl": "https://www.legion-aux.org/scholarships/spirit-of-youth",
+    "sourceUrl": "https://www.legion-aux.org/scholarships/spirit-of-youth",
+    "sourceName": "American Legion Auxiliary — Spirit of Youth Scholarship",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": ["ala-member"]
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.0,
+          "weight": "hard"
+        },
+        {
+          "kind": "hasActivity",
+          "tag": "ala-member",
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "mensa-foundation-scholarship-2026",
+    "name": "Mensa Foundation Scholarship Program",
+    "provider": "Mensa Education & Research Foundation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 2500,
+      "amountMax": 2500,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-02-28"
+    },
+    "applyUrl": "https://www.mensafoundation.org/what-we-do/scholarships/",
+    "sourceUrl": "https://www.mensafoundation.org/what-we-do/scholarships/",
+    "sourceName": "Mensa Education & Research Foundation — Scholarships",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["sophomore", "junior", "senior"],
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "nefb-foundation-scholarship-2026",
+    "name": "Nebraska Farm Bureau Foundation Scholarship",
+    "provider": "Nebraska Farm Bureau Foundation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 2500,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-03-01"
+    },
+    "applyUrl": "https://nefbfoundation.org/scholarships/",
+    "sourceUrl": "https://nefbfoundation.org/scholarships/",
+    "sourceName": "Nebraska Farm Bureau Foundation — Scholarships",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "state",
+      "state": "NE"
+    },
+    "tags": {
+      "majors": [
+        "Agriculture",
+        "Agricultural Education",
+        "Agribusiness"
+      ],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "residencyState",
+          "state": "NE",
+          "weight": "hard"
+        },
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["sophomore", "junior", "senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "majorIn",
+          "values": [
+            "Agriculture",
+            "Agricultural Education",
+            "Agribusiness"
+          ],
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "dar-america250-scholarship-2026",
+    "name": "DAR America 250! Scholarship",
+    "provider": "Daughters of the American Revolution",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 25000,
+      "amountMax": 25000,
+      "renewable": false
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-01-31"
+    },
+    "applyUrl": "https://www.dar.org/national-society/scholarships/general-info",
+    "sourceUrl": "https://www.dar.org/discover/media-center/news-releases/dar-america-250-scholarships-25000-each-ten-students-accepting",
+    "sourceName": "Daughters of the American Revolution — DAR America 250! Scholarship Announcement",
+    "lastVerifiedAt": "2026-06-16",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "History",
+        "American History",
+        "Political Science"
+      ],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["sophomore", "junior", "senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.5,
+          "weight": "hard"
+        },
+        {
+          "kind": "majorIn",
+          "values": [
+            "History",
+            "American History",
+            "Political Science"
+          ],
+          "weight": "hard"
         }
       ]
     }

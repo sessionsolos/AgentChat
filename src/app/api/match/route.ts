@@ -17,7 +17,7 @@ import { ZodError } from "zod";
 import { MatchRequestSchema } from "@/lib/schemas/match-result";
 import { matchProfile } from "@/lib/engine";
 import type { MatchResponse } from "@/lib/schemas/match-result";
-import type { AidRecord } from "@/lib/schemas/aid-record";
+import { loadAllAidRecords } from "@/lib/db/aid-records";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // 1. Parse and validate the request body
@@ -48,8 +48,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   // 2. Load aid records from the database
-  // WS-1: replace this stub with a real DB/Scorecard fetch.
-  const records: AidRecord[] = [];
+  // WS-1: load all AidRecords from SQLite, JSON-parse and Zod-validate.
+  const records = await loadAllAidRecords();
 
   // 3. Run the matching engine
   // WS-2: the engine stub returns [] until scoring is implemented.
