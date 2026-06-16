@@ -494,23 +494,24 @@ import { AidRecordSchema } from "@/lib/schemas";
 
 describe("Seed record integration", () => {
   // -------------------------------------------------------------------------
-  // Test 1 (was stale): now checks that the REAL gates-millennium-scholars-2026
-  // record (which exists in the seed) appears for a profile that meets its hard
-  // requirements, and that whyEligible is non-empty.
+  // Test 1: checks that the coca-cola-scholars-2026 record (national, senior,
+  // GPA >= 3.0 hard, no income gate) appears for a profile meeting hard rules,
+  // and verifies structural invariants across all matched records.
+  // (Gates Millennium was removed — it closed to new applicants after 2016.)
   // -------------------------------------------------------------------------
-  it("matchProfile returns gates-millennium-scholars-2026 for an eligible profile", () => {
+  it("matchProfile returns coca-cola-scholars-2026 for an eligible profile and upholds structural invariants", () => {
     const records = seedData.map((r) => AidRecordSchema.parse(r));
 
-    // Profile that satisfies Gates Millennium hard rules:
+    // Profile that satisfies Coca-Cola hard rules:
     //   citizenshipIn us_citizen/permanent_resident (hard)
-    //   gpaAtLeast 3.3 (hard)
     //   gradeLevelIn senior (hard)
+    //   gpaAtLeast 3.0 (hard)
     const profile: StudentProfile = {
       gradeLevel: "senior",
       gradYear: 2026,
       homeState: "CA",
       citizenship: "us_citizen",
-      gpa: 3.5,          // above 3.3 hard bar
+      gpa: 3.5,
       gpaScale: 4.0,
       testScores: {},
       intendedMajors: ["Computer Science"],
@@ -522,9 +523,13 @@ describe("Seed record integration", () => {
     expect(results.length).toBeGreaterThanOrEqual(1);
 
     // The specific record must be present — robust to future additions
+    const cokeResult = results.find((r) => r.aid.id === "coca-cola-scholars-2026");
+    expect(cokeResult).toBeDefined();
+    expect(cokeResult!.whyEligible.length).toBeGreaterThan(0);
+
+    // gates-millennium-scholars-2026 must NOT appear (program was closed after 2016)
     const gatesResult = results.find((r) => r.aid.id === "gates-millennium-scholars-2026");
-    expect(gatesResult).toBeDefined();
-    expect(gatesResult!.whyEligible.length).toBeGreaterThan(0);
+    expect(gatesResult).toBeUndefined();
 
     // Structural invariants that should survive seed edits
     for (const result of results) {

@@ -9,9 +9,9 @@
  *   • A hard leaf that is NOT met is "required-and-failed" only when the
  *     tree structure actually requires it.  In an `any` node only ONE
  *     branch needs to succeed; in an `all` node ALL must succeed.
- *   • A `not` node inverts the child's overall pass/fail (De Morgan-correct).
- *     The node as a whole passes when its child's overall result is false,
- *     and fails when its child's overall result is true.
+ *   • A `not` node inverts the child's OVERALL pass/fail (De Morgan-correct).
+ *     The node as a whole passes when its child's overall hard-gate result
+ *     is false, and fails when the child's overall result is true.
  *   • Missing optional profile fields (e.g., no SAT) are treated as
  *     "unknown/not-yet-met" — a soft gap — unless the leaf is hard AND
  *     there is no alternative branch (any-node) that passes.
@@ -67,17 +67,6 @@ export interface LeafResult {
 }
 
 // ---------------------------------------------------------------------------
-// NodeResult — internal: the boolean outcome of an entire subtree
-// ---------------------------------------------------------------------------
-
-interface NodeResult {
-  /** Aggregate pass/fail for the node as a whole (De Morgan-correct) */
-  passes: boolean;
-  /** Flat leaf results for scoring/explanations */
-  leaves: LeafResult[];
-}
-
-// ---------------------------------------------------------------------------
 // evaluate — returns all leaf results flattened, each tagged with whether
 // it was truly required by the tree structure.
 // ---------------------------------------------------------------------------
@@ -97,18 +86,6 @@ export function evaluate(
   profile: StudentProfile,
   parentRequired = true
 ): LeafResult[] {
-  return evaluateNode(rule, profile, parentRequired).leaves;
-}
-
-// ---------------------------------------------------------------------------
-// evaluateNode — returns NodeResult with both aggregate passes and leaves
-// ---------------------------------------------------------------------------
-
-function evaluateNode(
-  rule: EligibilityRuleSet,
-  profile: StudentProfile,
-  parentRequired: boolean
-): NodeResult {
   switch (rule.kind) {
     case "all":
       return evaluateAll(rule.rules, profile, parentRequired);
@@ -121,7 +98,85 @@ function evaluateNode(
 
     default:
       // Leaf predicate
-      return evaluateLeafNode(rule as LeafPredicate, profile, parentRequired);
+      return [evaluateLeaf(rule as LeafPredicate, profile, parentRequired)];
+  }
+}
+
+// ---------------------------------------------------------------------------
+// nodePassesHard — compute the aggregate hard-gate boolean for a subtree.
+//
+// This is the De Morgan-correct boolean: does the node as a whole pass from
+// a hard-filter standpoint (i.e., no hard-required unmet leaves)?
+//
+// This is evaluated with parentRequired=true so leaves know whether they
+// are genuinely required.
+// ---------------------------------------------------------------------------
+
+function nodePassesHard(
+  rule: EligibilityRuleSet,
+  profile: StudentProfile
+): boolean {
+  switch (rule.kind) {
+    case "all":
+      // AND: all children must pass hard.
+      return rule.rules.every((r) => nodePassesHard(r, profile));
+
+    case "any":
+      // OR: at least one child must pass hard.
+      return rule.rules.some((r) => nodePassesHard(r, profile));
+
+    case "not":
+      // NOT: pass iff child does NOT pass hard.
+      return !nodePassesHard(rule.rule, profile);
+
+    default: {
+      // Leaf: hard leaf must be met; soft leaf always passes the hard gate.
+      const leaf = rule as LeafPredicate;
+      if (leaf.weight !== "hard") return true;
+      return leafMet(leaf, profile);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// leafMet — pure boolean: does the student satisfy this leaf predicate?
+// ---------------------------------------------------------------------------
+
+function leafMet(leaf: LeafPredicate, profile: StudentProfile): boolean {
+  switch (leaf.kind) {
+    case "gpaAtLeast":
+      return profile.gpa >= leaf.value;
+    case "testAtLeast": {
+      const score =
+        leaf.test === "sat"
+          ? profile.testScores?.sat
+          : profile.testScores?.act;
+      if (score === undefined) return false; // missing → not met (but will be treated as soft gap in LeafResult)
+      return score >= leaf.value;
+    }
+    case "gradeLevelIn":
+      return leaf.values.includes(profile.gradeLevel);
+    case "residencyState":
+      return profile.homeState === leaf.state;
+    case "majorIn": {
+      const profileMajors = profile.intendedMajors.map((m) => m.toLowerCase());
+      return leaf.values.some((v) => profileMajors.includes(v.toLowerCase()));
+    }
+    case "incomeBandAtMost":
+      return incomeBandIndex(profile.householdIncomeBand) <= incomeBandIndex(leaf.band);
+    case "hasActivity":
+      return profile.activities.some(
+        (a) =>
+          a === leaf.tag ||
+          a.startsWith(leaf.tag + ":") ||
+          a.endsWith(":" + leaf.tag)
+      );
+    case "citizenshipIn":
+      return leaf.values.includes(profile.citizenship);
+    case "deadlineAfter": {
+      const today = new Date().toISOString().slice(0, 10);
+      return today <= leaf.date;
+    }
   }
 }
 
@@ -133,115 +188,101 @@ function evaluateAll(
   rules: EligibilityRuleSet[],
   profile: StudentProfile,
   parentRequired: boolean
-): NodeResult {
+): LeafResult[] {
   // In an `all` node every child must pass.  The parent's required-ness
   // propagates directly to every child.
-  const childResults = rules.map((r) => evaluateNode(r, profile, parentRequired));
-  const passes = childResults.every((c) => c.passes);
-  return {
-    passes,
-    leaves: childResults.flatMap((c) => c.leaves),
-  };
+  return rules.flatMap((r) => evaluate(r, profile, parentRequired));
 }
 
 function evaluateAny(
   rules: EligibilityRuleSet[],
   profile: StudentProfile,
   parentRequired: boolean
-): NodeResult {
+): LeafResult[] {
   // Evaluate every branch.
-  const childResults = rules.map((r) => evaluateNode(r, profile, parentRequired));
+  const branchResults = rules.map((r) => evaluate(r, profile, parentRequired));
 
-  // OR semantics: the any-node passes if at least one child passes.
-  const anyChildPasses = childResults.some((c) => c.passes);
+  // Compute node-level pass/fail using correct boolean logic for each branch.
+  const branchPasses = rules.map((r) => nodePassesHard(r, profile));
+  const anyBranchPasses = branchPasses.some(Boolean);
 
-  if (anyChildPasses) {
-    // At least one branch passes — downgrade hard-required unmet leaves in
-    // the FAILING branches so they are not treated as disqualifying.
-    const leaves = childResults.flatMap((childResult) => {
-      if (childResult.passes) {
+  if (anyBranchPasses) {
+    // At least one branch passes. Downgrade hard-required unmet leaves in
+    // the FAILING branches — they're alternative paths, not real gaps.
+    return branchResults.flatMap((branchLeaves, idx) => {
+      if (branchPasses[idx]) {
         // Passing branch: keep leaves as-is.
-        return childResult.leaves;
+        return branchLeaves;
       }
-      // Failing branch: it was an alternative path; downgrade all its
-      // hard-required unmet leaves to not-required (and suppress from
-      // whyNotPerfect by marking them as met=true, required=false).
-      return childResult.leaves.map((lr) => ({
+      // Failing branch: mark all leaves suppressed — they were an alternative
+      // path the student didn't need to take.
+      return branchLeaves.map((lr) => ({
         ...lr,
-        // If this branch didn't pass and wasn't needed (sibling passed),
-        // suppress this leaf from explanations entirely.
         required: false,
-        met: lr.met,
-        // Mark suppressed so explain.ts can skip it from whyNotPerfect too.
         _suppressed: true,
       }));
     });
-    return { passes: true, leaves };
   }
 
   // No branch passes — all hard leaves in ALL branches remain required.
-  return {
-    passes: false,
-    leaves: childResults.flatMap((c) => c.leaves),
-  };
+  return branchResults.flatMap((b) => b);
 }
 
 function evaluateNot(
   rule: EligibilityRuleSet,
   profile: StudentProfile,
   parentRequired: boolean
-): NodeResult {
-  // Evaluate the child without propagating parentRequired yet — we need
-  // to know the child's aggregate outcome first.
-  const child = evaluateNode(rule, profile, false);
+): LeafResult[] {
+  // First determine the child's overall hard-gate result (De Morgan-correct).
+  const childPassesHard = nodePassesHard(rule, profile);
 
-  // NOT semantics: the NOT-node passes iff the child does NOT pass.
-  const passes = !child.passes;
+  // NOT semantics: this node passes iff the child does NOT pass hard.
+  const notPasses = !childPassesHard;
 
-  if (passes) {
-    // The NOT-node is satisfied (child failed overall).
-    // Surface the child's leaves as met=true (we passed the not-gate),
-    // not-required (no remaining disqualification), with plain-language
-    // description reflecting the negated sense.
-    const leaves = child.leaves.map((lr) => ({
+  if (notPasses) {
+    // The NOT gate is satisfied (child failed overall — that's what we wanted).
+    // Collect the child's leaves as informational context:
+    //   - met=true (we passed the not-gate so this is positive for us)
+    //   - required=false (no disqualification needed)
+    //   - plain-language negated description
+    const childLeaves = evaluate(rule, profile, false);
+    return childLeaves.map((lr) => ({
       ...lr,
       met: true,
       required: false,
       description: negatedDescription(lr),
     }));
-    return { passes: true, leaves };
   } else {
-    // The NOT-node fails (child passed overall — that's bad here).
-    // If parentRequired, this is a hard disqualification.
-    // Surface the child's leaves as met=false with negated descriptions.
-    const leaves = child.leaves.map((lr) => ({
+    // The NOT gate is NOT satisfied (child passed hard — that's bad here).
+    // The student is excluded when parentRequired=true.
+    // Collect child leaves, invert met, compute required from parentRequired.
+    const childLeaves = evaluate(rule, profile, false);
+    return childLeaves.map((lr) => ({
       ...lr,
       met: false,
       required: parentRequired && lr.leaf.weight === "hard",
       description: negatedDescription(lr),
     }));
-    return { passes: false, leaves };
   }
 }
 
 // ---------------------------------------------------------------------------
-// Plain-language negation helper
+// Plain-language negation helper — avoids mechanical "NOT:" prefix
 // ---------------------------------------------------------------------------
 
-/**
- * Converts a leaf description to its negated sense without mechanical "NOT:" prefix.
- */
 function negatedDescription(lr: LeafResult): string {
   const leaf = lr.leaf;
+  // Extract the student value from the original description where possible.
+  // Fall back to a generic negation.
   switch (leaf.kind) {
     case "residencyState":
-      return `Not restricted to ${leaf.state} residents (you: ${lr.description.includes("(you:") ? lr.description.split("(you:")[1].replace(")", "").trim() : "n/a"})`;
+      return `Not restricted to ${leaf.state} residents`;
     case "gradeLevelIn":
       return `Not restricted to ${leaf.values.join("/")} students`;
     case "citizenshipIn":
       return `Not restricted to ${leaf.values.join("/")} applicants`;
     case "gpaAtLeast":
-      return `Eligible: GPA threshold does not apply here (${leaf.value.toFixed(1)} requirement inverted)`;
+      return `Eligible: GPA gate of ${leaf.value.toFixed(1)} is excluded by this rule`;
     case "majorIn":
       return `Not restricted to declared major in: ${leaf.values.join(", ")}`;
     case "incomeBandAtMost":
@@ -251,35 +292,15 @@ function negatedDescription(lr: LeafResult): string {
     case "testAtLeast":
       return `Not restricted to students with ${leaf.test.toUpperCase()} ≥ ${leaf.value}`;
     case "deadlineAfter":
-      return `Not restricted by deadline ${leaf.date}`;
+      return `Not restricted by the ${leaf.date} deadline`;
     default:
-      // Fallback: use original description without "NOT:" mechanical prefix
       return lr.description;
   }
 }
 
 // ---------------------------------------------------------------------------
-// Leaf evaluator (returns NodeResult)
+// Leaf evaluator
 // ---------------------------------------------------------------------------
-
-function evaluateLeafNode(
-  leaf: LeafPredicate,
-  profile: StudentProfile,
-  parentRequired: boolean
-): NodeResult {
-  const lr = evaluateLeaf(leaf, profile, parentRequired);
-  return {
-    passes: lr.met || !lr.required,
-    leaves: [lr],
-  };
-}
-
-/**
- * A leaf node "passes" from the hard-filter perspective when:
- *  - met is true, OR
- *  - the leaf is not required (soft weight, or parentRequired=false, or missing optional test)
- * A leaf node "fails" (would disqualify) only when required=true AND met=false.
- */
 
 function evaluateLeaf(
   leaf: LeafPredicate,
@@ -434,14 +455,6 @@ function evaluateLeaf(
       };
     }
   }
-}
-
-// ---------------------------------------------------------------------------
-// Helper: does a branch's leaf set contain no hard-required unmet leaves?
-// ---------------------------------------------------------------------------
-
-function branchPasses(leaves: LeafResult[]): boolean {
-  return !leaves.some((lr) => lr.required && !lr.met);
 }
 
 // ---------------------------------------------------------------------------
