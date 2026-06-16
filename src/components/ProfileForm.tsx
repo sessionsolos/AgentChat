@@ -832,10 +832,44 @@ export function ProfileForm() {
 
       {/* Results */}
       {apiState.status === "success" && (
-        <div id="results-section">
+        <div id="results-section" className="space-y-16">
           <ResultsPanel
             results={apiState.data.results}
             generatedAt={apiState.data.meta.generatedAt}
+          />
+
+          {/* School Cost Comparison — rendered once scholarship results are ready */}
+          {schoolsState.status !== "idle" && (
+            <SchoolCostPanel
+              state={
+                schoolsState.status === "loading"
+                  ? { status: "loading" }
+                  : schoolsState.status === "error"
+                  ? { status: "error", message: schoolsState.message }
+                  : { status: "success", data: schoolsState.data }
+              }
+              homeState={
+                schoolsState.status === "success"
+                  ? schoolsState.homeState
+                  : form.homeState
+              }
+              incomeBand={
+                schoolsState.status === "success"
+                  ? schoolsState.incomeBand
+                  : undefined
+              }
+            />
+          )}
+        </div>
+      )}
+
+      {/* School costs shown while match is still loading (schools API returned first) */}
+      {apiState.status === "loading" && schoolsState.status === "success" && (
+        <div className="space-y-16">
+          <SchoolCostPanel
+            state={{ status: "success", data: schoolsState.data }}
+            homeState={schoolsState.homeState}
+            incomeBand={schoolsState.incomeBand}
           />
         </div>
       )}

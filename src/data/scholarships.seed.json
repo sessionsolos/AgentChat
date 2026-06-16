@@ -4,6 +4,7 @@
     "name": "Coca-Cola Scholars Program",
     "provider": "Coca-Cola Scholars Foundation",
     "type": "scholarship",
+    "selectivity": "highly_selective",
     "award": {
       "amountMin": 20000,
       "amountMax": 20000,
@@ -50,6 +51,7 @@
     "name": "Horatio Alger National Scholarship",
     "provider": "Horatio Alger Association",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 25000,
       "amountMax": 25000,
@@ -101,6 +103,7 @@
     "name": "Elks Most Valuable Student Scholarship",
     "provider": "Elks National Foundation",
     "type": "scholarship",
+    "selectivity": "highly_selective",
     "award": {
       "amountMin": 4000,
       "amountMax": 30000,
@@ -141,6 +144,7 @@
     "name": "Federal Pell Grant",
     "provider": "U.S. Department of Education",
     "type": "grant",
+    "selectivity": "open",
     "award": {
       "amountMin": 750,
       "amountMax": 7395,
@@ -180,6 +184,7 @@
     "id": "national-merit-scholarship-2026",
     "name": "National Merit Scholarship Program",
     "provider": "National Merit Scholarship Corporation",
+    "selectivity": "highly_selective",
     "type": "scholarship",
     "description": "Entry is based on the PSAT/NMSQT Selection Index score taken in junior year, not on SAT performance. Students who achieve a high enough Selection Index are notified as Semifinalists in their senior year and may advance to Finalist standing.",
     "award": {
@@ -223,6 +228,7 @@
     "name": "National Honor Society Scholarship",
     "provider": "National Association of Secondary School Principals (NASSP)",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 1000,
       "amountMax": 13000,
@@ -269,6 +275,7 @@
     "name": "Susan Thompson Buffett Foundation Scholarship",
     "provider": "Susan Thompson Buffett Foundation",
     "type": "scholarship",
+    "selectivity": "open",
     "award": {
       "amountMin": 0,
       "amountMax": 9750,
@@ -321,6 +328,7 @@
     "name": "Nebraska Opportunity Grant",
     "provider": "Nebraska Coordinating Commission for Postsecondary Education",
     "type": "grant",
+    "selectivity": "open",
     "award": {
       "amountMin": 0,
       "amountMax": 4000,
@@ -367,6 +375,7 @@
     "name": "Nebraska Promise",
     "provider": "University of Nebraska System",
     "type": "grant",
+    "selectivity": "open",
     "award": {
       "amountMin": 0,
       "amountMax": 12000,
@@ -414,6 +423,7 @@
     "name": "Access College Early (ACE) Scholarship Program",
     "provider": "Nebraska Coordinating Commission for Postsecondary Education",
     "type": "scholarship",
+    "selectivity": "open",
     "award": {
       "amountMin": 0,
       "amountMax": 5000,
@@ -466,6 +476,7 @@
     "name": "Nebraska Career Scholarship Program",
     "provider": "Nebraska Coordinating Commission for Postsecondary Education",
     "type": "scholarship",
+    "selectivity": "open",
     "award": {
       "amountMin": 0,
       "amountMax": 5000,
@@ -522,6 +533,7 @@
     "name": "QuestBridge National College Match Scholarship",
     "provider": "QuestBridge",
     "type": "scholarship",
+    "selectivity": "highly_selective",
     "award": {
       "amountMin": 0,
       "amountMax": 220000,
@@ -573,6 +585,7 @@
     "name": "Dell Scholars Program",
     "provider": "Michael & Susan Dell Foundation",
     "type": "scholarship",
+    "selectivity": "highly_selective",
     "award": {
       "amountMin": 20000,
       "amountMax": 20000,
@@ -624,6 +637,7 @@
     "name": "Jack Kent Cooke College Scholarship",
     "provider": "Jack Kent Cooke Foundation",
     "type": "scholarship",
+    "selectivity": "highly_selective",
     "award": {
       "amountMin": 0,
       "amountMax": 55000,
@@ -675,6 +689,7 @@
     "name": "American Chemical Society (ACS) Scholars Program",
     "provider": "American Chemical Society",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 0,
       "amountMax": 5000,
@@ -741,6 +756,7 @@
     "name": "SWE Emerging First Year Scholarship",
     "provider": "Society of Women Engineers",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 1000,
       "amountMax": 15000,
@@ -793,6 +809,7 @@
     "name": "DoD SMART Scholarship for Service Program",
     "provider": "U.S. Department of Defense",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 25000,
       "amountMax": 38000,
@@ -856,6 +873,7 @@
     "name": "TEACH Grant (Teacher Education Assistance for College and Higher Education)",
     "provider": "U.S. Department of Education",
     "type": "grant",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 0,
       "amountMax": 4000,
@@ -911,6 +929,7 @@
     "name": "TYLENOL Future Care Scholarship",
     "provider": "Johnson & Johnson / TYLENOL",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 5000,
       "amountMax": 10000,
@@ -962,6 +981,7 @@
     "name": "Hispanic Scholarship Fund Scholarship",
     "provider": "Hispanic Scholarship Fund",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 500,
       "amountMax": 5000,
@@ -1001,6 +1021,11 @@
           "weight": "hard"
         },
         {
+          "kind": "ethnicityIn",
+          "values": ["hispanic"],
+          "weight": "hard"
+        },
+        {
           "kind": "incomeBandAtMost",
           "band": "75-110k",
           "weight": "soft"
@@ -1013,6 +1038,7 @@
     "name": "Equitable Excellence Scholarship",
     "provider": "Equitable Foundation",
     "type": "scholarship",
+    "selectivity": "highly_selective",
     "award": {
       "amountMin": 5000,
       "amountMax": 5000,
@@ -1064,6 +1090,7 @@
     "name": "Burger King Scholars Program",
     "provider": "Burger King Foundation / Scholarship America",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 1000,
       "amountMax": 60000,
@@ -1110,6 +1137,7 @@
     "name": "Ron Brown Scholar Program",
     "provider": "Ron Brown Scholar Program",
     "type": "scholarship",
+    "selectivity": "highly_selective",
     "award": {
       "amountMin": 40000,
       "amountMax": 40000,
@@ -1144,6 +1172,11 @@
           "weight": "hard"
         },
         {
+          "kind": "ethnicityIn",
+          "values": ["black"],
+          "weight": "hard"
+        },
+        {
           "kind": "incomeBandAtMost",
           "band": "75-110k",
           "weight": "soft"
@@ -1156,6 +1189,7 @@
     "name": "Davidson Fellows Scholarship",
     "provider": "Davidson Institute",
     "type": "scholarship",
+    "selectivity": "highly_selective",
     "award": {
       "amountMin": 25000,
       "amountMax": 100000,
@@ -1204,6 +1238,7 @@
     "name": "Scholastic Art & Writing Awards Scholarship",
     "provider": "Alliance for Young Artists & Writers",
     "type": "scholarship",
+    "selectivity": "open",
     "award": {
       "amountMin": 0,
       "amountMax": 12500,
@@ -1249,6 +1284,7 @@
     "name": "Regeneron Science Talent Search",
     "provider": "Society for Science / Regeneron",
     "type": "scholarship",
+    "selectivity": "highly_selective",
     "award": {
       "amountMin": 25000,
       "amountMax": 250000,
@@ -1303,6 +1339,7 @@
     "name": "USTA Foundation College Scholarship",
     "provider": "USTA Foundation",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 6000,
       "amountMax": 6000,
@@ -1354,6 +1391,7 @@
     "name": "National FFA Scholarship Program",
     "provider": "National FFA Organization",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 1000,
       "amountMax": 10000,
@@ -1408,6 +1446,7 @@
     "name": "American Legion Auxiliary Spirit of Youth Scholarship",
     "provider": "American Legion Auxiliary",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 5000,
       "amountMax": 5000,
@@ -1459,6 +1498,7 @@
     "name": "Mensa Foundation Scholarship Program",
     "provider": "Mensa Education & Research Foundation",
     "type": "scholarship",
+    "selectivity": "highly_selective",
     "award": {
       "amountMin": 2500,
       "amountMax": 2500,
@@ -1500,6 +1540,7 @@
     "name": "Nebraska Farm Bureau Foundation Scholarship",
     "provider": "Nebraska Farm Bureau Foundation",
     "type": "scholarship",
+    "selectivity": "open",
     "award": {
       "amountMin": 0,
       "amountMax": 2500,
@@ -1560,6 +1601,7 @@
     "name": "DAR America 250! Scholarship",
     "provider": "Daughters of the American Revolution",
     "type": "scholarship",
+    "selectivity": "competitive",
     "award": {
       "amountMin": 25000,
       "amountMax": 25000,

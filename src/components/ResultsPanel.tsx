@@ -16,10 +16,10 @@ const BAND_HEADINGS: Record<FeasibilityBand, string> = {
 };
 
 const BAND_DESCRIPTIONS: Record<FeasibilityBand, string> = {
-  strong: "You meet the key criteria — these are your best bets.",
+  strong: "You meet the key criteria — these are your strongest opportunities.",
   possible:
     "You meet many criteria; some requirements may be selective or competitive.",
-  reach: "Worth applying, but these are more competitive or criteria-constrained.",
+  reach: "Worth keeping an eye on — these are more competitive or criteria-constrained. Great ones to work toward.",
 };
 
 export function ResultsPanel({ results, generatedAt }: ResultsPanelProps) {
@@ -45,12 +45,13 @@ export function ResultsPanel({ results, generatedAt }: ResultsPanelProps) {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-800 mb-2">
-            No matches found
+            No matches found yet
           </h3>
           <p className="text-gray-500 max-w-md mx-auto text-sm">
-            We didn&apos;t find scholarships matching your current profile. Try
-            broadening your intended majors, activities, or check back as new
-            scholarships are added.
+            We didn&apos;t find scholarships matching your profile right now.
+            Try adding more activities, broadening your intended majors, or
+            check back as new scholarships are added — many open up in junior
+            year.
           </p>
         </div>
       </section>
@@ -70,10 +71,15 @@ export function ResultsPanel({ results, generatedAt }: ResultsPanelProps) {
 
   return (
     <section aria-label="Scholarship results" className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">
-          {results.length} Scholarship{results.length !== 1 ? "s" : ""} Found
-        </h2>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {results.length} Scholarship{results.length !== 1 ? "s" : ""} Found
+          </h2>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Results are based on your profile — eligibility and amounts may vary. Always confirm directly with the provider.
+          </p>
+        </div>
         <p className="text-xs text-gray-400">Generated {generatedDate}</p>
       </div>
 

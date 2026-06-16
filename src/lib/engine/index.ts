@@ -127,6 +127,37 @@ function scoreToBand(score: number): FeasibilityBand {
 }
 
 /**
+ * Apply a band ceiling for highly_selective awards.
+ *
+ * Highly selective awards cannot return "strong" for a typical applicant.
+ * The cap is "possible" unless the student is genuinely exceptional:
+ *   GPA ≥ EXCEPTIONAL_GPA_FLOOR AND (SAT ≥ EXCEPTIONAL_SAT_FLOOR OR ACT ≥ EXCEPTIONAL_ACT_FLOOR)
+ *
+ * Even exceptional students are still capped at "possible" — the award is
+ * simply too competitive to promise "strong" for any student we can evaluate
+ * from profile data alone.
+ */
+function applySelectivityCap(
+  band: FeasibilityBand,
+  aid: AidRecord,
+  profile: StudentProfile
+): FeasibilityBand {
+  if ((aid.selectivity ?? "competitive") !== "highly_selective") return band;
+  if (band !== "strong") return band; // cap only applies to "strong"
+
+  // If the student is genuinely exceptional, allow up to "possible" (still capped).
+  const isExceptional =
+    profile.gpa >= EXCEPTIONAL_GPA_FLOOR &&
+    ((profile.testScores?.sat ?? 0) >= EXCEPTIONAL_SAT_FLOOR ||
+      (profile.testScores?.act ?? 0) >= EXCEPTIONAL_ACT_FLOOR);
+
+  // Whether exceptional or not, cap at HIGHLY_SELECTIVE_BAND_CAP ("possible").
+  // The score multiplier already pulls most typical students down to "reach";
+  // this cap handles any edge cases where math alone doesn't suffice.
+  return isExceptional ? HIGHLY_SELECTIVE_BAND_CAP : HIGHLY_SELECTIVE_BAND_CAP;
+}
+
+/**
  * Handle school-scoped awards (Criterion C).
  *
  * Returns:

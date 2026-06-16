@@ -46,6 +46,7 @@ function makeAid(
     name: "Test Scholarship",
     provider: "Test Foundation",
     type: "scholarship",
+    selectivity: "competitive",
     award: { amountMin: 1000, amountMax: 5000, renewable: false },
     deadline: { type: "rolling" },
     sourceUrl: "https://example.com/scholarship",

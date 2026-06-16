@@ -11,6 +11,8 @@ export default function HomePage() {
         <p className="text-gray-500 text-lg max-w-2xl">
           Fill in your profile and we&apos;ll match you to scholarships and
           financial aid programs that fit your background, academics, and goals.
+          Whether you&apos;re a rising junior starting to plan ahead or a senior
+          ready to apply, there&apos;s something here for you.
         </p>
       </div>
 
