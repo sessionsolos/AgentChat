@@ -1,0 +1,68 @@
+[
+  {
+    "id": "example-gates-millennium-2025",
+    "name": "Gates Millennium Scholars Program",
+    "provider": "Bill & Melinda Gates Foundation",
+    "type": "scholarship",
+    "award": {
+      "amountMin": 0,
+      "amountMax": 60000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2025-01-15"
+    },
+    "applyUrl": "https://www.gmsp.org/",
+    "sourceUrl": "https://www.gmsp.org/",
+    "sourceName": "Gates Millennium Scholars Program Official Site",
+    "lastVerifiedAt": "2025-01-01",
+    "scope": {
+      "level": "national"
+    },
+    "tags": {
+      "majors": [
+        "Computer Science",
+        "Engineering",
+        "Education",
+        "Library Science",
+        "Mathematics",
+        "Public Health",
+        "Science"
+      ],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.3,
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "incomeBandAtMost",
+          "band": "48-75k",
+          "weight": "soft"
+        },
+        {
+          "kind": "any",
+          "rules": [
+            { "kind": "majorIn", "values": ["Computer Science", "Engineering", "Mathematics", "Science"], "weight": "soft" },
+            { "kind": "majorIn", "values": ["Education", "Library Science", "Public Health"], "weight": "soft" }
+          ]
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,98 @@
+// Prisma schema — SQLite for local dev
+// To switch to Postgres: change provider to "postgresql" and update DATABASE_URL.
+// Field types (String, Int, Float, Boolean, Json) are compatible with both.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// StudentProfile
+// Mirrors StudentProfileSchema from src/lib/schemas/student-profile.ts
+// Stored as a session snapshot; not required to persist long-term.
+// ---------------------------------------------------------------------------
+model StudentProfile {
+  id                 String   @id @default(cuid())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  gradeLevel         String   // "sophomore" | "junior" | "senior"
+  gradYear           Int
+  homeState          String   // 2-letter US state code
+  citizenship        String   // CitizenshipSchema enum value
+  gpa                Float
+  gpaScale           Float    @default(4.0)
+
+  // JSON-encoded objects/arrays (SQLite-compatible; use proper columns in Postgres migration)
+  testScores         String   // JSON: TestScoresSchema
+  intendedMajors     String   // JSON: string[]
+  targetSchoolIds    String?  // JSON: string[] | null
+  householdIncomeBand String  // IncomeBandSchema enum value
+  dependentStatus    String?  // "dependent" | "independent" | null
+  householdSize      Int?
+  activities         String   // JSON: string[]
+  demographics       String?  // JSON: DemographicsSchema | null
+
+  MatchResult MatchResult[]
+
+  @@map("student_profiles")
+}
+
+// ---------------------------------------------------------------------------
+// AidRecord
+// Mirrors AidRecordSchema from src/lib/schemas/aid-record.ts
+// This is the core scholarship/grant catalogue.
+// ---------------------------------------------------------------------------
+model AidRecord {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  name           String
+  provider       String
+  type           String   // "scholarship" | "grant" | "institutional_aid"
+
+  // Provenance — mandatory on every record (WS-1 must populate these)
+  sourceUrl      String
+  sourceName     String
+  lastVerifiedAt String   // ISO date string (e.g. "2025-01-15")
+
+  // JSON-encoded complex fields
+  award          String   // JSON: AwardSchema
+  deadline       String   // JSON: DeadlineSchema discriminated union
+  applyUrl       String?
+  scope          String   // JSON: ScopeSchema
+  tags           String   // JSON: TagsSchema
+  eligibility    String   // JSON: EligibilityRuleSetSchema (recursive)
+
+  MatchResult MatchResult[]
+
+  @@map("aid_records")
+}
+
+// ---------------------------------------------------------------------------
+// MatchResult
+// Persists the output of a matching session for caching / analytics.
+// ---------------------------------------------------------------------------
+model MatchResult {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id])
+
+  aidRecordId      String
+  aidRecord        AidRecord @relation(fields: [aidRecordId], references: [id])
+
+  feasibilityScore Float    // 0–100
+  band             String   // "strong" | "possible" | "reach"
+  whyEligible      String   // JSON: string[]
+  whyNotPerfect    String   // JSON: string[]
+
+  @@map("match_results")
+}
