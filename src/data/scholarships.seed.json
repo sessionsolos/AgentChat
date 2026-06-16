@@ -456,7 +456,7 @@
         {
           "kind": "incomeBandAtMost",
           "band": "30-48k",
-          "weight": "hard"
+          "weight": "soft"
         }
       ]
     }
@@ -614,7 +614,7 @@
         {
           "kind": "incomeBandAtMost",
           "band": "48-75k",
-          "weight": "hard"
+          "weight": "soft"
         }
       ]
     }

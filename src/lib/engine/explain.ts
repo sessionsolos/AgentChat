@@ -38,6 +38,10 @@ export function buildExplanations(
   const whyNotPerfect: string[] = [];
 
   for (const lr of leaves) {
+    // Skip leaves from failing branches of a satisfied `any` node — those
+    // represent alternative paths the student didn't need to take, not gaps.
+    if (lr._suppressed) continue;
+
     if (lr.met) {
       whyEligible.push(lr.description);
     } else if (!lr.required) {

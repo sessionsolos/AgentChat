@@ -34,22 +34,32 @@ const US_STATES = [
   ["WY", "Wyoming"],
 ] as const;
 
-const QUICK_ADD_ACTIVITIES = [
-  "National Honor Society",
-  "athletics:tennis",
-  "athletics:basketball",
-  "athletics:soccer",
-  "debate",
-  "volunteering",
-  "student government",
-  "robotics",
-  "band",
-  "theater",
-  "stem club",
-  "environmental club",
-  "community service",
-  "eagle scout",
-  "4-h",
+// Canonical activity tags — must stay in sync with the hasActivity predicates
+// in the seed data (src/data/scholarships.seed.json).
+// Current canonical set: nhs, tennis, art, science-research, ffa, ala-member,
+//   debate, volunteering, student-government, robotics, band, theater,
+//   stem-club, environmental-club, community-service, eagle-scout, 4-h,
+//   athletics:basketball, athletics:soccer.
+const QUICK_ADD_ACTIVITIES: QuickAddItem[] = [
+  { label: "National Honor Society", value: "nhs" },
+  { label: "Tennis", value: "tennis" },
+  { label: "Art / Scholastic Art", value: "art" },
+  { label: "Science Research", value: "science-research" },
+  { label: "FFA / Agriculture", value: "ffa" },
+  { label: "American Legion Auxiliary", value: "ala-member" },
+  { label: "Basketball", value: "athletics:basketball" },
+  { label: "Soccer", value: "athletics:soccer" },
+  { label: "Debate", value: "debate" },
+  { label: "Volunteering", value: "volunteering" },
+  { label: "Student Government", value: "student-government" },
+  { label: "Robotics", value: "robotics" },
+  { label: "Band", value: "band" },
+  { label: "Theater", value: "theater" },
+  { label: "STEM Club", value: "stem-club" },
+  { label: "Environmental Club", value: "environmental-club" },
+  { label: "Community Service", value: "community-service" },
+  { label: "Eagle Scout", value: "eagle-scout" },
+  { label: "4-H", value: "4-h" },
 ];
 
 const QUICK_ADD_MAJORS = [
@@ -77,10 +87,8 @@ interface FormState {
   homeState: string;
   citizenship: string;
   gpa: string;
-  gpaScale: string;
   sat: string;
   act: string;
-  psat: string;
   intendedMajors: string[];
   householdIncomeBand: string;
   dependentStatus: string;
@@ -98,10 +106,8 @@ const INITIAL_STATE: FormState = {
   homeState: "",
   citizenship: "",
   gpa: "",
-  gpaScale: "4.0",
   sat: "",
   act: "",
-  psat: "",
   intendedMajors: [],
   householdIncomeBand: "",
   dependentStatus: "",
@@ -164,11 +170,39 @@ function selectCls(hasError: boolean) {
 // Helper: coerce form state → StudentProfile shape for Zod
 // ---------------------------------------------------------------------------
 
+// Maps common free-typed activity synonyms to their canonical tag values.
+// Keep this in sync with QUICK_ADD_ACTIVITIES and the seed's hasActivity tags.
+const ACTIVITY_SYNONYM_MAP: Record<string, string> = {
+  "national honor society": "nhs",
+  "nhs": "nhs",
+  "honor society": "nhs",
+  "scholastic art": "art",
+  "art and writing": "art",
+  "art & writing": "art",
+  "science research": "science-research",
+  "stem research": "science-research",
+  "ffa": "ffa",
+  "future farmers of america": "ffa",
+  "agriculture": "ffa",
+  "american legion auxiliary": "ala-member",
+  "ala": "ala-member",
+  "student government": "student-government",
+  "stem club": "stem-club",
+  "environmental club": "environmental-club",
+  "community service": "community-service",
+  "eagle scout": "eagle-scout",
+};
+
+/** Normalize a free-typed activity: trim, lowercase, then map synonyms. */
+function normalizeActivity(raw: string): string {
+  const lower = raw.trim().toLowerCase();
+  return ACTIVITY_SYNONYM_MAP[lower] ?? lower;
+}
+
 function buildProfile(s: FormState): unknown {
   const testScores: Record<string, number> = {};
   if (s.sat) testScores.sat = parseInt(s.sat, 10);
   if (s.act) testScores.act = parseInt(s.act, 10);
-  if (s.psat) testScores.psat = parseFloat(s.psat);
 
   const demographics: Record<string, unknown> = {};
   if (s.firstGenCollegeStudent) demographics.firstGenCollegeStudent = true;
@@ -182,14 +216,16 @@ function buildProfile(s: FormState): unknown {
     homeState: s.homeState || undefined,
     citizenship: s.citizenship || undefined,
     gpa: s.gpa !== "" ? parseFloat(s.gpa) : undefined,
-    gpaScale: s.gpaScale !== "" ? parseFloat(s.gpaScale) : 4.0,
+    // GPA is always on the 4.0 scale — the scale selector has been removed.
+    gpaScale: 4.0,
     testScores,
     intendedMajors: s.intendedMajors,
     householdIncomeBand: s.householdIncomeBand || undefined,
     dependentStatus: s.dependentStatus || undefined,
     householdSize:
       s.householdSize !== "" ? parseInt(s.householdSize, 10) : undefined,
-    activities: s.activities,
+    // Activities are already canonical from chips; free-typed ones are normalized.
+    activities: s.activities.map(normalizeActivity),
     demographics: Object.keys(demographics).length > 0 ? demographics : undefined,
   };
 }
@@ -321,7 +357,7 @@ export function ProfileForm() {
             <input
               id="gradYear"
               type="number"
-              min={2024}
+              min={2020}
               max={2040}
               placeholder="e.g. 2026"
               value={form.gradYear}
@@ -335,7 +371,7 @@ export function ProfileForm() {
 
           {/* GPA */}
           <div>
-            <Label htmlFor="gpa">Unweighted GPA</Label>
+            <Label htmlFor="gpa">Unweighted GPA (4.0 scale)</Label>
             <input
               id="gpa"
               type="number"
@@ -350,22 +386,6 @@ export function ProfileForm() {
               aria-describedby={err("gpa") ? "gpa-error" : undefined}
             />
             <FieldError id="gpa-error" message={err("gpa")} />
-          </div>
-
-          {/* GPA Scale */}
-          <div>
-            <Label htmlFor="gpaScale">GPA Scale</Label>
-            <select
-              id="gpaScale"
-              value={form.gpaScale}
-              onChange={setStr("gpaScale")}
-              className={selectCls(!!err("gpaScale"))}
-            >
-              <option value="4.0">4.0 scale</option>
-              <option value="5.0">5.0 (weighted)</option>
-              <option value="100">100-point scale</option>
-            </select>
-            <FieldError id="gpaScale-error" message={err("gpaScale")} />
           </div>
         </FormSection>
 
@@ -417,23 +437,6 @@ export function ProfileForm() {
             <FieldError id="act-error" message={err("testScores", "act")} />
           </div>
 
-          <div>
-            <Label htmlFor="psat" optional>
-              PSAT/NMSQT Score
-            </Label>
-            <input
-              id="psat"
-              type="number"
-              min={320}
-              max={1520}
-              step={10}
-              placeholder="320 – 1520"
-              value={form.psat}
-              onChange={setStr("psat")}
-              className={inputCls(!!err("testScores", "psat"))}
-            />
-            <FieldError id="psat-error" message={err("testScores", "psat")} />
-          </div>
         </FormSection>
 
         {/* ── Location & Citizenship ── */}
