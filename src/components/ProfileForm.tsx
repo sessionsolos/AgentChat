@@ -7,7 +7,7 @@ import {
   type MatchResponse,
 } from "@/lib/schemas";
 import { FormSection, FullWidthField } from "./FormSection";
-import { TagInput } from "./TagInput";
+import { TagInput, type QuickAddItem } from "./TagInput";
 import { FieldError } from "./FieldError";
 import { ResultsPanel } from "./ResultsPanel";
 

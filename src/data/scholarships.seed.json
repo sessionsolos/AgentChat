@@ -91,7 +91,7 @@
         {
           "kind": "incomeBandAtMost",
           "band": "48-75k",
-          "weight": "hard"
+          "weight": "soft"
         }
       ]
     }
@@ -107,8 +107,7 @@
       "renewable": true
     },
     "deadline": {
-      "type": "date",
-      "date": "2027-01-31"
+      "type": "unknown"
     },
     "applyUrl": "https://www.elks.org/scholars/scholarships/mvs.cfm",
     "sourceUrl": "https://www.elks.org/scholars/scholarships/mvs.cfm",
@@ -133,65 +132,6 @@
           "kind": "gradeLevelIn",
           "values": ["senior"],
           "weight": "hard"
-        }
-      ]
-    }
-  },
-  {
-    "id": "gates-millennium-scholars-2026",
-    "name": "Gates Millennium Scholars Program",
-    "provider": "Bill & Melinda Gates Foundation",
-    "type": "scholarship",
-    "award": {
-      "amountMin": 0,
-      "amountMax": 60000,
-      "renewable": true
-    },
-    "deadline": {
-      "type": "date",
-      "date": "2027-01-13"
-    },
-    "applyUrl": "https://gmsp.org/",
-    "sourceUrl": "https://gmsp.org/a-faqs/",
-    "sourceName": "Gates Millennium Scholars Program — FAQs",
-    "lastVerifiedAt": "2026-06-16",
-    "scope": {
-      "level": "national"
-    },
-    "tags": {
-      "majors": [
-        "Computer Science",
-        "Engineering",
-        "Education",
-        "Library Science",
-        "Mathematics",
-        "Public Health",
-        "Science"
-      ],
-      "activities": []
-    },
-    "eligibility": {
-      "kind": "all",
-      "rules": [
-        {
-          "kind": "citizenshipIn",
-          "values": ["us_citizen", "permanent_resident"],
-          "weight": "hard"
-        },
-        {
-          "kind": "gpaAtLeast",
-          "value": 3.3,
-          "weight": "hard"
-        },
-        {
-          "kind": "gradeLevelIn",
-          "values": ["senior"],
-          "weight": "hard"
-        },
-        {
-          "kind": "incomeBandAtMost",
-          "band": "48-75k",
-          "weight": "soft"
         }
       ]
     }
@@ -241,6 +181,7 @@
     "name": "National Merit Scholarship Program",
     "provider": "National Merit Scholarship Corporation",
     "type": "scholarship",
+    "description": "Entry is based on the PSAT/NMSQT Selection Index score taken in junior year, not on SAT performance. Students who achieve a high enough Selection Index are notified as Semifinalists in their senior year and may advance to Finalist standing.",
     "award": {
       "amountMin": 2500,
       "amountMax": 2500,
@@ -273,12 +214,6 @@
           "kind": "gradeLevelIn",
           "values": ["senior"],
           "weight": "hard"
-        },
-        {
-          "kind": "testAtLeast",
-          "test": "sat",
-          "value": 1400,
-          "weight": "soft"
         }
       ]
     }
@@ -464,7 +399,7 @@
         {
           "kind": "incomeBandAtMost",
           "band": "48-75k",
-          "weight": "hard"
+          "weight": "soft"
         },
         {
           "kind": "gpaAtLeast",

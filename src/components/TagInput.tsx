@@ -2,13 +2,17 @@
 
 import { useState, useRef, KeyboardEvent } from "react";
 
+/** A quick-add chip can be a plain string (value = display label lowercased) or
+ * an object with separate display label and canonical stored value. */
+export type QuickAddItem = string | { label: string; value: string };
+
 interface TagInputProps {
   id: string;
   label: string;
   values: string[];
   onChange: (values: string[]) => void;
   placeholder?: string;
-  quickAdd?: string[];
+  quickAdd?: QuickAddItem[];
   error?: string;
 }
 
@@ -105,17 +109,28 @@ export function TagInput({
       {quickAdd && quickAdd.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1.5">
           {quickAdd
-            .filter((q) => !values.includes(q.toLowerCase()))
-            .map((q) => (
-              <button
-                key={q}
-                type="button"
-                onClick={() => addTag(q)}
-                className="text-xs px-2.5 py-1 rounded-full border border-gray-300 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:border-gray-400 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
-              >
-                + {q}
-              </button>
-            ))}
+            .filter((q) => {
+              const canonical = typeof q === "string" ? q.trim().toLowerCase() : q.value;
+              return !values.includes(canonical);
+            })
+            .map((q) => {
+              const displayLabel = typeof q === "string" ? q : q.label;
+              const canonicalValue = typeof q === "string" ? q : q.value;
+              return (
+                <button
+                  key={canonicalValue}
+                  type="button"
+                  onClick={() => {
+                    if (!values.includes(canonicalValue)) {
+                      onChange([...values, canonicalValue]);
+                    }
+                  }}
+                  className="text-xs px-2.5 py-1 rounded-full border border-gray-300 bg-gray-50 text-gray-600 hover:bg-gray-100 hover:border-gray-400 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+                >
+                  + {displayLabel}
+                </button>
+              );
+            })}
         </div>
       )}
 
