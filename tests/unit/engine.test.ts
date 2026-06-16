@@ -493,16 +493,24 @@ import seedData from "@/data/scholarships.seed.json";
 import { AidRecordSchema } from "@/lib/schemas";
 
 describe("Seed record integration", () => {
-  it("matchProfile works with seed records and a fully eligible profile", () => {
+  // -------------------------------------------------------------------------
+  // Test 1 (was stale): now checks that the REAL gates-millennium-scholars-2026
+  // record (which exists in the seed) appears for a profile that meets its hard
+  // requirements, and that whyEligible is non-empty.
+  // -------------------------------------------------------------------------
+  it("matchProfile returns gates-millennium-scholars-2026 for an eligible profile", () => {
     const records = seedData.map((r) => AidRecordSchema.parse(r));
 
-    // Profile that satisfies the Gates Millennium seed record
+    // Profile that satisfies Gates Millennium hard rules:
+    //   citizenshipIn us_citizen/permanent_resident (hard)
+    //   gpaAtLeast 3.3 (hard)
+    //   gradeLevelIn senior (hard)
     const profile: StudentProfile = {
       gradeLevel: "senior",
       gradYear: 2026,
       homeState: "CA",
       citizenship: "us_citizen",
-      gpa: 3.5,   // above 3.3 hard bar
+      gpa: 3.5,          // above 3.3 hard bar
       gpaScale: 4.0,
       testScores: {},
       intendedMajors: ["Computer Science"],
@@ -511,32 +519,97 @@ describe("Seed record integration", () => {
     };
 
     const results = matchProfile(profile, records);
-    // The Gates record has a passed deadline (2025-01-15), but should still be
-    // included (deadline urgency is a note, not a hard-filter exclusion).
     expect(results.length).toBeGreaterThanOrEqual(1);
 
-    const gatesResult = results.find((r) => r.aid.id === "example-gates-millennium-2025");
+    // The specific record must be present — robust to future additions
+    const gatesResult = results.find((r) => r.aid.id === "gates-millennium-scholars-2026");
     expect(gatesResult).toBeDefined();
     expect(gatesResult!.whyEligible.length).toBeGreaterThan(0);
+
+    // Structural invariants that should survive seed edits
+    for (const result of results) {
+      // Every result must have a non-empty citation sourceUrl
+      expect(result.citation.sourceUrl).toBeTruthy();
+      // Band must be one of the three valid values
+      expect(["strong", "possible", "reach"]).toContain(result.band);
+    }
+
+    // Results are sorted by feasibilityScore descending
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i - 1].feasibilityScore).toBeGreaterThanOrEqual(
+        results[i].feasibilityScore
+      );
+    }
   });
 
-  it("matchProfile excludes the seed record for a student who does not meet hard requirements", () => {
+  // -------------------------------------------------------------------------
+  // Test 2 (was stale): the old test assumed no award would match a profile
+  // with international citizenship + low GPA + high income, but the seed
+  // contains awards with no hard citizenship or GPA requirements that a
+  // sophomore can still pass.
+  //
+  // New approach: test specific record presence/absence using awards with
+  // known hard residency requirements (Nebraska-only awards).
+  //
+  //   * susan-buffett-scholarship-2026  — hard residencyState=NE
+  //   * nebraska-opportunity-grant-2026 — hard residencyState=NE
+  //
+  // For a non-NE student both must be ABSENT. For a NE-eligible student
+  // susan-buffett must be PRESENT (NE, senior, gpa>=2.0).
+  // -------------------------------------------------------------------------
+  it("Nebraska-only awards are absent for non-NE student, present for NE student", () => {
     const records = seedData.map((r) => AidRecordSchema.parse(r));
 
-    const profile: StudentProfile = {
-      gradeLevel: "sophomore",  // seed requires "senior" (hard)
-      gradYear: 2028,
-      homeState: "TX",
-      citizenship: "international",  // seed requires us_citizen/permanent_resident (hard)
-      gpa: 2.5,  // below 3.3 (hard)
+    const NE_ONLY_IDS = [
+      "susan-buffett-scholarship-2026",
+      "nebraska-opportunity-grant-2026",
+    ];
+
+    // Non-Nebraska student — both NE awards must be absent
+    const nonNeProfile: StudentProfile = {
+      gradeLevel: "senior",
+      gradYear: 2026,
+      homeState: "CA",
+      citizenship: "us_citizen",
+      gpa: 3.5,
       gpaScale: 4.0,
       testScores: {},
-      intendedMajors: ["Art History"],
-      householdIncomeBand: "110k+",
+      intendedMajors: ["Computer Science"],
+      householdIncomeBand: "30-48k",
       activities: [],
     };
 
-    const results = matchProfile(profile, records);
-    expect(results).toHaveLength(0);
+    const nonNeResults = matchProfile(nonNeProfile, records);
+    const nonNeIds = nonNeResults.map((r) => r.aid.id);
+
+    for (const id of NE_ONLY_IDS) {
+      expect(nonNeIds, `${id} should NOT appear for a CA student`).not.toContain(id);
+    }
+
+    // Nebraska senior with GPA ≥ 2.0 — susan-buffett must be present
+    const neProfile: StudentProfile = {
+      gradeLevel: "senior",
+      gradYear: 2026,
+      homeState: "NE",
+      citizenship: "us_citizen",
+      gpa: 3.0,
+      gpaScale: 4.0,
+      testScores: {},
+      intendedMajors: ["Computer Science"],
+      householdIncomeBand: "30-48k",
+      activities: [],
+    };
+
+    const neResults = matchProfile(neProfile, records);
+    const neIds = neResults.map((r) => r.aid.id);
+
+    expect(
+      neIds,
+      "susan-buffett-scholarship-2026 must appear for a NE senior with gpa≥2.0"
+    ).toContain("susan-buffett-scholarship-2026");
+
+    // Confirm the matched award has non-empty whyEligible
+    const buffettResult = neResults.find((r) => r.aid.id === "susan-buffett-scholarship-2026");
+    expect(buffettResult!.whyEligible.length).toBeGreaterThan(0);
   });
 });
