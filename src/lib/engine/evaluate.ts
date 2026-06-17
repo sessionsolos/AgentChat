@@ -361,7 +361,7 @@ function negatedDescription(lr: LeafResult): string {
     case "hasActivity":
       return `Not restricted to students with "${leaf.tag}" activity`;
     case "testAtLeast":
-      return `Not restricted to students with ${leaf.test.toUpperCase()} >= ${leaf.value}`;
+      return `Not restricted to students with ${leaf.test.toUpperCase()} ≥ ${leaf.value}`;
     case "deadlineAfter":
       return `Not restricted by the ${leaf.date} deadline`;
     case "ethnicityIn":
@@ -477,7 +477,7 @@ function evaluateLeaf(
         met,
         required,
         description: met
-          ? `Need-based: your income band (${profile.householdIncomeBand}) is within the target range (<=  ${leaf.band})`
+          ? `Need-based: your income band (${profile.householdIncomeBand}) is within the target range (≤${leaf.band})`
           : `Income band (${profile.householdIncomeBand}) exceeds the need-based ceiling (${leaf.band})`,
       };
     }
