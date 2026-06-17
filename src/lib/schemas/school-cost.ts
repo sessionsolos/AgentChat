@@ -119,3 +119,32 @@ export const SchoolsResponseSchema = z.object({
 });
 
 export type SchoolsResponse = z.infer<typeof SchoolsResponseSchema>;
+
+// ---------------------------------------------------------------------------
+// SchoolSearchResult — lightweight result from name search
+// ---------------------------------------------------------------------------
+
+export const SchoolSearchResultSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  city: z.string(),
+  state: z.string().length(2),
+  control: z.enum(["public", "private"]),
+});
+
+export type SchoolSearchResult = z.infer<typeof SchoolSearchResultSchema>;
+
+// ---------------------------------------------------------------------------
+// SchoolSearchResponse — POST /api/schools/search response body
+// ---------------------------------------------------------------------------
+
+export const SchoolSearchResponseSchema = z.object({
+  results: z.array(SchoolSearchResultSchema),
+  meta: z.object({
+    dataSource: z.enum(["live", "cached"]),
+    /** ISO datetime when this response was generated */
+    generatedAt: z.string().datetime(),
+  }),
+});
+
+export type SchoolSearchResponse = z.infer<typeof SchoolSearchResponseSchema>;

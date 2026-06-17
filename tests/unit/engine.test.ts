@@ -618,4 +618,67 @@ describe("Seed record integration", () => {
     const buffettResult = neResults.find((r) => r.aid.id === "susan-buffett-scholarship-2026");
     expect(buffettResult!.whyEligible.length).toBeGreaterThan(0);
   });
+
+  // -------------------------------------------------------------------------
+  // Test 3: school-scoped UNL awards surface only when 181464 is in
+  // targetSchoolIds, and are absent when a different school list is given.
+  // Uses unl-chancellors-tuition-scholarship-instate-2026 (scope.scorecardId
+  // = "181464", hard residencyState=NE, hard gradeLevelIn senior, hard
+  // gpaAtLeast 3.5) from the seed.
+  // -------------------------------------------------------------------------
+  it("UNL school-scoped awards surface only when 181464 is in targetSchoolIds", () => {
+    const records = seedData.map((r) => AidRecordSchema.parse(r));
+
+    const UNL_SCHOOL_ID = "181464";
+    const UNL_AWARD_ID = "unl-chancellors-tuition-scholarship-instate-2026";
+
+    // Profile that meets all hard eligibility rules for the UNL Chancellor award
+    const eligibleBase: StudentProfile = {
+      gradeLevel: "senior",
+      gradYear: 2027,
+      homeState: "NE",
+      citizenship: "us_citizen",
+      gpa: 3.8,
+      gpaScale: 4.0,
+      testScores: { act: 30 },
+      intendedMajors: ["Engineering"],
+      householdIncomeBand: "48-75k",
+      activities: [],
+    };
+
+    // 1. targetSchoolIds includes UNL → award must be present
+    const withUNL = matchProfile(
+      { ...eligibleBase, targetSchoolIds: [UNL_SCHOOL_ID] },
+      records
+    );
+    expect(
+      withUNL.map((r) => r.aid.id),
+      `${UNL_AWARD_ID} must appear when ${UNL_SCHOOL_ID} is in targetSchoolIds`
+    ).toContain(UNL_AWARD_ID);
+
+    // 2. targetSchoolIds lists other schools only → award must be absent
+    const withoutUNL = matchProfile(
+      { ...eligibleBase, targetSchoolIds: ["181394", "181215"] },
+      records
+    );
+    expect(
+      withoutUNL.map((r) => r.aid.id),
+      `${UNL_AWARD_ID} must NOT appear when ${UNL_SCHOOL_ID} is absent from targetSchoolIds`
+    ).not.toContain(UNL_AWARD_ID);
+
+    // 3. No targetSchoolIds → award included but whyNotPerfect notes the school ID
+    const noSchoolList = matchProfile(
+      { ...eligibleBase, targetSchoolIds: undefined },
+      records
+    );
+    const unlResult = noSchoolList.find((r) => r.aid.id === UNL_AWARD_ID);
+    expect(
+      unlResult,
+      `${UNL_AWARD_ID} should still appear when targetSchoolIds is absent`
+    ).toBeDefined();
+    expect(
+      unlResult!.whyNotPerfect.some((s) => s.includes(UNL_SCHOOL_ID)),
+      "whyNotPerfect should note the school ID when targetSchoolIds is absent"
+    ).toBe(true);
+  });
 });

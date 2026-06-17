@@ -1655,5 +1655,395 @@
         }
       ]
     }
+  },
+  {
+    "id": "unl-chancellors-tuition-scholarship-instate-2026",
+    "name": "Chancellor's Tuition Scholarship (In-State)",
+    "provider": "University of Nebraska–Lincoln",
+    "type": "institutional_aid",
+    "selectivity": "competitive",
+    "award": {
+      "amountMin": 4000,
+      "amountMax": 8000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-02-01"
+    },
+    "applyUrl": "https://admissions.unl.edu/cost/scholarships/chancellors-tuition-scholarship-in-state/",
+    "sourceUrl": "https://admissions.unl.edu/cost/scholarships/chancellors-tuition-scholarship-in-state/",
+    "sourceName": "UNL Admissions — Chancellor's Tuition Scholarship (In-State)",
+    "lastVerifiedAt": "2026-06-17",
+    "scope": {
+      "level": "school",
+      "scorecardId": "181464"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "residencyState",
+          "state": "NE",
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.5,
+          "weight": "hard"
+        },
+        {
+          "kind": "testAtLeast",
+          "test": "act",
+          "value": 28,
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "unl-regents-scholar-tuition-2026",
+    "name": "Regents Scholar Tuition Commitment",
+    "provider": "University of Nebraska–Lincoln",
+    "type": "institutional_aid",
+    "selectivity": "highly_selective",
+    "award": {
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-02-01"
+    },
+    "applyUrl": "https://admissions.unl.edu/cost/scholarships/regents-scholar-tuition-commitment/",
+    "sourceUrl": "https://admissions.unl.edu/cost/scholarships/regents-scholar-tuition-commitment/",
+    "sourceName": "UNL Admissions — Regents Scholar Tuition Commitment",
+    "lastVerifiedAt": "2026-06-17",
+    "scope": {
+      "level": "school",
+      "scorecardId": "181464"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "residencyState",
+          "state": "NE",
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "testAtLeast",
+          "test": "act",
+          "value": 32,
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.5,
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "uno-maverick-scholarship-2026",
+    "name": "Maverick Scholarship",
+    "provider": "University of Nebraska Omaha",
+    "type": "institutional_aid",
+    "selectivity": "open",
+    "award": {
+      "amountMin": 1000,
+      "amountMax": 5500,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-02-28"
+    },
+    "applyUrl": "https://www.unomaha.edu/admissions/financial-support-and-scholarships/types-of-aid/scholarships/uno.php",
+    "sourceUrl": "https://www.unomaha.edu/admissions/financial-support-and-scholarships/types-of-aid/scholarships/uno.php",
+    "sourceName": "UNO Admissions — UNO Scholarships",
+    "lastVerifiedAt": "2026-06-17",
+    "scope": {
+      "level": "school",
+      "scorecardId": "181394"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "residencyState",
+          "state": "NE",
+          "weight": "hard"
+        },
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.25,
+          "weight": "hard"
+        },
+        {
+          "kind": "testAtLeast",
+          "test": "act",
+          "value": 23,
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "unk-distinguished-scholar-award-2026",
+    "name": "Distinguished Scholar Award",
+    "provider": "University of Nebraska at Kearney",
+    "type": "institutional_aid",
+    "selectivity": "open",
+    "award": {
+      "amountMin": 5000,
+      "amountMax": 6000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-03-01"
+    },
+    "applyUrl": "https://www.unk.edu/first-time-freshmen-scholarships.php",
+    "sourceUrl": "https://www.unk.edu/first-time-freshmen-scholarships.php",
+    "sourceName": "UNK — First-Time Freshmen Scholarships",
+    "lastVerifiedAt": "2026-06-17",
+    "scope": {
+      "level": "school",
+      "scorecardId": "181215"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.7,
+          "weight": "hard"
+        },
+        {
+          "kind": "testAtLeast",
+          "test": "act",
+          "value": 26,
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "unk-chancellors-scholarship-2026",
+    "name": "Chancellor's Scholarship",
+    "provider": "University of Nebraska at Kearney",
+    "type": "institutional_aid",
+    "selectivity": "competitive",
+    "award": {
+      "amountMin": 7000,
+      "amountMax": 9000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-03-01"
+    },
+    "applyUrl": "https://www.unk.edu/first-time-freshmen-scholarships.php",
+    "sourceUrl": "https://www.unk.edu/first-time-freshmen-scholarships.php",
+    "sourceName": "UNK — First-Time Freshmen Scholarships",
+    "lastVerifiedAt": "2026-06-17",
+    "scope": {
+      "level": "school",
+      "scorecardId": "181215"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.9,
+          "weight": "hard"
+        },
+        {
+          "kind": "testAtLeast",
+          "test": "act",
+          "value": 28,
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "creighton-distinguished-scholars-2026",
+    "name": "Distinguished Scholars Programs",
+    "provider": "Creighton University",
+    "type": "scholarship",
+    "selectivity": "highly_selective",
+    "award": {
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-01-10"
+    },
+    "applyUrl": "https://www.creighton.edu/academics/distinguished-scholars-program",
+    "sourceUrl": "https://www.creighton.edu/academics/distinguished-scholars-program",
+    "sourceName": "Creighton University — Distinguished Scholars Programs",
+    "lastVerifiedAt": "2026-06-17",
+    "scope": {
+      "level": "school",
+      "scorecardId": "181002"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.3,
+          "weight": "hard"
+        },
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "soft"
+        }
+      ]
+    }
+  },
+  {
+    "id": "ku-achievement-scholarship-2026",
+    "name": "KU Achievement Scholarship",
+    "provider": "University of Kansas",
+    "type": "institutional_aid",
+    "selectivity": "open",
+    "award": {
+      "amountMin": 8000,
+      "amountMax": 12000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2026-05-01"
+    },
+    "applyUrl": "https://admissions.ku.edu/afford/scholarships",
+    "sourceUrl": "https://admissions.ku.edu/afford/scholarships",
+    "sourceName": "KU Admissions — Freshman Scholarships",
+    "lastVerifiedAt": "2026-06-17",
+    "scope": {
+      "level": "school",
+      "scorecardId": "155317"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "gpaAtLeast",
+          "value": 3.7,
+          "weight": "hard"
+        }
+      ]
+    }
+  },
+  {
+    "id": "uiowa-national-scholars-award-2026",
+    "name": "National Scholars Award",
+    "provider": "University of Iowa",
+    "type": "institutional_aid",
+    "selectivity": "open",
+    "award": {
+      "amountMin": 2000,
+      "amountMax": 15000,
+      "renewable": true
+    },
+    "deadline": {
+      "type": "date",
+      "date": "2027-02-02"
+    },
+    "applyUrl": "https://admissions.uiowa.edu/scholarship/national-scholars-award-nsa",
+    "sourceUrl": "https://admissions.uiowa.edu/scholarship/national-scholars-award-nsa",
+    "sourceName": "University of Iowa Admissions — National Scholars Award (NSA)",
+    "lastVerifiedAt": "2026-06-17",
+    "scope": {
+      "level": "school",
+      "scorecardId": "153658"
+    },
+    "tags": {
+      "majors": [],
+      "activities": []
+    },
+    "eligibility": {
+      "kind": "all",
+      "rules": [
+        {
+          "kind": "gradeLevelIn",
+          "values": ["senior"],
+          "weight": "hard"
+        },
+        {
+          "kind": "citizenshipIn",
+          "values": ["us_citizen", "permanent_resident"],
+          "weight": "soft"
+        }
+      ]
+    }
   }
 ]

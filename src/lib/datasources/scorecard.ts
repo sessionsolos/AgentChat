@@ -2,7 +2,7 @@
  * College Scorecard datasource.
  *
  * Exports the original stub functions (unchanged contract) plus the new
- * fetchSchoolCosts function added for criterion C (WS-1 / school-cost feature).
+ * fetchSchoolCosts, fetchSchoolsByIds, and searchSchoolsByName functions.
  *
  * API docs: https://collegescorecard.ed.gov/data/documentation/
  * Key endpoint: GET https://api.data.gov/ed/collegescorecard/v1/schools
@@ -17,10 +17,18 @@
  *   latest.cost.net_price.public.by_income_level.75001-110000
  *   latest.cost.net_price.public.by_income_level.110001-plus
  *   (same paths with .private. for private institutions)
+ *   latest.aid.pell_grant_rate  — IPEDS PCTPELL; fraction 0–1
+ *   latest.aid.federal_loan_rate — IPEDS PCTFLOAN; fraction 0–1
+ *   latest.cost.avg_net_price.public  — overall avg net price (public institutions)
+ *   latest.cost.avg_net_price.private — overall avg net price (private institutions)
  */
 
 import type { AidRecord } from "@/lib/schemas/aid-record";
-import type { SchoolCost, SchoolsRequest } from "@/lib/schemas/school-cost";
+import type {
+  SchoolCost,
+  SchoolsRequest,
+  SchoolSearchResult,
+} from "@/lib/schemas/school-cost";
 import cachedSchools from "@/data/schools.cache.json";
 
 // ---------------------------------------------------------------------------
@@ -63,14 +71,15 @@ export async function fetchAidRecordsBySchool(
  *
  * @param scorecardId  - College Scorecard unitid string
  * @returns            - School name and basic metadata, or null if not found.
- * @throws             - "not implemented" until WS-1 fills this in.
  */
 export async function fetchSchoolMetadata(
   scorecardId: string
 ): Promise<{ id: string; name: string; city: string; state: string } | null> {
-  // WS-1: implement Scorecard API call here.
-  void scorecardId;
-  throw new Error("fetchSchoolMetadata: not implemented (WS-1)");
+  const cached = getCachedSchools().find((s) => s.id === scorecardId);
+  if (cached) {
+    return { id: cached.id, name: cached.name, city: cached.city, state: cached.state };
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -98,6 +107,12 @@ interface ScorecardSchool {
   "latest.cost.net_price.private.by_income_level.48001-75000": number | null;
   "latest.cost.net_price.private.by_income_level.75001-110000": number | null;
   "latest.cost.net_price.private.by_income_level.110001-plus": number | null;
+  // Institutional aid fields (IPEDS)
+  "latest.aid.pell_grant_rate": number | null;
+  "latest.aid.federal_loan_rate": number | null;
+  // Overall average net price (not income-banded)
+  "latest.cost.avg_net_price.public": number | null;
+  "latest.cost.avg_net_price.private": number | null;
 }
 
 interface ScorecardResponse {
@@ -131,6 +146,10 @@ const SCORECARD_FIELDS = [
   "latest.cost.net_price.private.by_income_level.48001-75000",
   "latest.cost.net_price.private.by_income_level.75001-110000",
   "latest.cost.net_price.private.by_income_level.110001-plus",
+  "latest.aid.pell_grant_rate",
+  "latest.aid.federal_loan_rate",
+  "latest.cost.avg_net_price.public",
+  "latest.cost.avg_net_price.private",
 ].join(",");
 
 const SCORECARD_BASE = "https://api.data.gov/ed/collegescorecard/v1/schools";
@@ -174,6 +193,22 @@ function mapSchool(raw: ScorecardSchool): SchoolCost {
     if (v4 != null) netPriceByIncome["110k+"] = v4;
   }
 
+  // Build institutionalAid — omit keys when null
+  const pellRate = raw["latest.aid.pell_grant_rate"];
+  const loanRate = raw["latest.aid.federal_loan_rate"];
+  const avgNetPriceRaw = isPublic
+    ? raw["latest.cost.avg_net_price.public"]
+    : raw["latest.cost.avg_net_price.private"];
+
+  const hasAidData = pellRate != null || loanRate != null || avgNetPriceRaw != null;
+  const institutionalAid: SchoolCost["institutionalAid"] = hasAidData
+    ? {
+        ...(pellRate != null ? { pellGrantRate: pellRate } : {}),
+        ...(loanRate != null ? { federalLoanRate: loanRate } : {}),
+        ...(avgNetPriceRaw != null ? { avgNetPrice: avgNetPriceRaw } : {}),
+      }
+    : undefined;
+
   const school: SchoolCost = {
     id: String(raw.id),
     name: raw["school.name"],
@@ -195,6 +230,9 @@ function mapSchool(raw: ScorecardSchool): SchoolCost {
   if (raw["latest.cost.tuition.out_of_state"] != null) {
     school.tuitionOutOfState = raw["latest.cost.tuition.out_of_state"]!;
   }
+  if (institutionalAid !== undefined) {
+    school.institutionalAid = institutionalAid;
+  }
 
   return school;
 }
@@ -209,7 +247,7 @@ function getCachedSchools(): SchoolCost[] {
 }
 
 // ---------------------------------------------------------------------------
-// fetchSchoolCosts — main exported function
+// fetchSchoolCosts — main exported function (state-based)
 // ---------------------------------------------------------------------------
 
 /**
@@ -245,7 +283,7 @@ export async function fetchSchoolCosts(
     while (results.length < total) {
       const params = new URLSearchParams({
         api_key: apiKey,
-        "school.state": req.state,
+        "school.state": req.state!,
         fields: SCORECARD_FIELDS,
         per_page: String(PER_PAGE),
         page: String(page),
@@ -296,4 +334,139 @@ export async function fetchSchoolCosts(
       (s) => s.state === req.state || req.includeOutOfState
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+// fetchSchoolsByIds — lookup by Scorecard unitid list
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch full SchoolCost records for a list of Scorecard unitids.
+ *
+ * Tries the live Scorecard API first (comma-joined id= filter).
+ * Falls back to filtering the cached schools by id on any failure or missing key.
+ *
+ * @param ids - Array of Scorecard unitid strings
+ * @returns   - Array of SchoolCost records (may be a subset if some ids are unknown)
+ */
+export async function fetchSchoolsByIds(ids: string[]): Promise<SchoolCost[]> {
+  if (ids.length === 0) return [];
+
+  const apiKey = process.env.DATA_GOV_API_KEY;
+
+  if (!apiKey) {
+    return getCachedSchools().filter((s) => ids.includes(s.id));
+  }
+
+  try {
+    const params = new URLSearchParams({
+      api_key: apiKey,
+      id: ids.join(","),
+      fields: SCORECARD_FIELDS,
+      per_page: String(PER_PAGE),
+      page: "0",
+    });
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    let response: Response;
+    try {
+      response = await fetch(`${SCORECARD_BASE}?${params.toString()}`, {
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (!response.ok) {
+      throw new Error(`Scorecard API returned HTTP ${response.status} for ids=${ids.join(",")}`);
+    }
+
+    const data = (await response.json()) as ScorecardResponse;
+    return data.results.map(mapSchool);
+  } catch {
+    // Network blocked, timeout, API error — fall back to cache silently.
+    return getCachedSchools().filter((s) => ids.includes(s.id));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// searchSchoolsByName — name substring search
+// ---------------------------------------------------------------------------
+
+/**
+ * Search for schools by name substring.
+ *
+ * Tries the live Scorecard API first.
+ * Falls back to case-insensitive substring matching over the cached schools.
+ *
+ * @param q     - Search query string (case-insensitive substring)
+ * @param limit - Maximum number of results to return (default 10)
+ * @returns     - Array of SchoolSearchResult records
+ */
+export async function searchSchoolsByName(
+  q: string,
+  limit = 10
+): Promise<SchoolSearchResult[]> {
+  const apiKey = process.env.DATA_GOV_API_KEY;
+
+  if (!apiKey) {
+    return searchCacheByName(q, limit);
+  }
+
+  try {
+    const params = new URLSearchParams({
+      api_key: apiKey,
+      "school.name": q,
+      fields: "id,school.name,school.city,school.state,school.ownership",
+      per_page: String(limit),
+      page: "0",
+    });
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    let response: Response;
+    try {
+      response = await fetch(`${SCORECARD_BASE}?${params.toString()}`, {
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (!response.ok) {
+      throw new Error(`Scorecard API returned HTTP ${response.status} for name search q=${q}`);
+    }
+
+    const data = (await response.json()) as ScorecardResponse;
+    return data.results.map((raw) => ({
+      id: String(raw.id),
+      name: raw["school.name"],
+      city: raw["school.city"],
+      state: raw["school.state"],
+      control: ownershipToControl(raw["school.ownership"]),
+    }));
+  } catch {
+    // Network blocked, timeout, API error — fall back to cache silently.
+    return searchCacheByName(q, limit);
+  }
+}
+
+/**
+ * Case-insensitive substring search over the cached schools.
+ */
+function searchCacheByName(q: string, limit: number): SchoolSearchResult[] {
+  const lower = q.toLowerCase();
+  return getCachedSchools()
+    .filter((s) => s.name.toLowerCase().includes(lower))
+    .slice(0, limit)
+    .map((s) => ({
+      id: s.id,
+      name: s.name,
+      city: s.city,
+      state: s.state,
+      control: s.control,
+    }));
 }
