@@ -71,6 +71,15 @@ export function buildExplanations(
     whyNotPerfect.unshift(deadlineNote);
   }
 
+  // Selectivity: for a competitive/highly-selective award, this is often the
+  // main reason a qualifying student still ranks "possible" or "reach" rather
+  // than "strong". Surface it so the band is explainable (a card shouldn't show
+  // all green checks and an unexplained low score).
+  const selectivityNote = buildSelectivityNote(aid);
+  if (selectivityNote) {
+    whyNotPerfect.push(selectivityNote);
+  }
+
   return { whyEligible, whyNotPerfect };
 }
 
@@ -122,4 +131,24 @@ function buildDeadlineNote(
   }
 
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// Selectivity helper
+// ---------------------------------------------------------------------------
+
+/**
+ * Explain how competitive an award is, so a qualifying student understands why
+ * it may rank "possible" or "reach" rather than "strong". `open` awards have no
+ * competitive selection step, so they get no note.
+ */
+function buildSelectivityNote(aid: AidRecord): string | null {
+  switch (aid.selectivity) {
+    case "highly_selective":
+      return "Highly selective — a nationally competitive award; meeting the requirements doesn't guarantee selection.";
+    case "competitive":
+      return "Competitive — qualifying applicants are not guaranteed an award.";
+    default:
+      return null; // "open" awards (need/eligibility-based, no competitive selection)
+  }
 }
