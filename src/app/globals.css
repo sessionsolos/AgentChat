@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8f7f4;
+  --foreground: #1a1a2e;
+  --card: #ffffff;
+  --border: #e2ddd6;
+  --muted: #6b7280;
+  --accent-blue: #1e4b8c;
+  --accent-blue-light: #2d6bc4;
+  --strong: #166534;
+  --strong-bg: #dcfce7;
+  --strong-border: #bbf7d0;
+  --possible: #854d0e;
+  --possible-bg: #fef9c3;
+  --possible-border: #fde68a;
+  --reach: #9a3412;
+  --reach-bg: #ffedd5;
+  --reach-border: #fed7aa;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f1117;
+    --foreground: #e8e6e0;
+    --card: #1a1d26;
+    --border: #2d3149;
+    --muted: #9ca3af;
+    --accent-blue: #4a8fd4;
+    --accent-blue-light: #6aaff0;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto,
+    sans-serif;
+}
+
+/* Focus ring consistent throughout */
+*:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
