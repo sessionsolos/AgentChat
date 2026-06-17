@@ -74,7 +74,7 @@ export interface LeafResult {
  * Context passed through the recursive evaluation tree.
  *
  * isInCycle: whether the student is currently in their application cycle
- *   (i.e., current calendar year ≥ gradYear - 1).  When false, a
+ *   (i.e., current calendar year >= gradYear - 1).  When false, a
  *   deadlineAfter leaf whose date has passed in the current year is treated
  *   as met (no hard-block) because the scholarship recurs annually and the
  *   student's actual application window is in a future year.
@@ -88,6 +88,25 @@ export interface EvalContext {
 }
 
 // ---------------------------------------------------------------------------
+// defaultCtx — derive an EvalContext from the student profile and the clock
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a default EvalContext from the student profile.
+ *
+ * Cycle derivation rule: a student is considered "in their application cycle"
+ * when the current calendar year is >= gradYear - 1.  A student who will
+ * graduate in 2028 (rising junior as of 2026) is NOT in cycle; their senior
+ * year begins in fall 2027 and they apply in the 2027-28 cycle.
+ */
+export function defaultCtx(profile: StudentProfile, asOf?: Date): EvalContext {
+  const now = asOf ?? new Date();
+  const currentYear = now.getFullYear();
+  const isInCycle = currentYear >= profile.gradYear - 1;
+  return { isInCycle, asOf: now };
+}
+
+// ---------------------------------------------------------------------------
 // evaluate — returns all leaf results flattened, each tagged with whether
 // it was truly required by the tree structure.
 // ---------------------------------------------------------------------------
@@ -95,14 +114,14 @@ export interface EvalContext {
 /**
  * Evaluates the rule tree for a student and returns per-leaf results.
  *
- * @param rule        - The rule node to evaluate (recursive).
- * @param profile     - The student's profile.
+ * @param rule           - The rule node to evaluate (recursive).
+ * @param profile        - The student's profile.
  * @param parentRequired - Whether the current node is required (hard) by its
- *                       parent chain.  Defaults to true (top-level all nodes
- *                       are always required).
- * @param ctx         - Evaluation context (isInCycle, asOf). Optional; when
- *                       omitted defaults are derived from new Date().
- * @returns             - Flat array of LeafResult.
+ *                         parent chain.  Defaults to true (top-level all nodes
+ *                         are always required).
+ * @param ctx            - Evaluation context (isInCycle, asOf). Optional; when
+ *                         omitted defaults are derived from new Date().
+ * @returns                Flat array of LeafResult.
  */
 export function evaluate(
   rule: EligibilityRuleSet,
@@ -139,20 +158,21 @@ export function evaluate(
 
 function nodePassesHard(
   rule: EligibilityRuleSet,
-  profile: StudentProfile
+  profile: StudentProfile,
+  ctx: EvalContext
 ): boolean {
   switch (rule.kind) {
     case "all":
       // AND: all children must pass hard.
-      return rule.rules.every((r) => nodePassesHard(r, profile));
+      return rule.rules.every((r) => nodePassesHard(r, profile, ctx));
 
     case "any":
       // OR: at least one child must pass hard.
-      return rule.rules.some((r) => nodePassesHard(r, profile));
+      return rule.rules.some((r) => nodePassesHard(r, profile, ctx));
 
     case "not":
       // NOT: pass iff child does NOT pass hard.
-      return !nodePassesHard(rule.rule, profile);
+      return !nodePassesHard(rule.rule, profile, ctx);
 
     default: {
       // Leaf: hard leaf must be met; soft leaf always passes the hard gate.
@@ -168,7 +188,7 @@ function nodePassesHard(
           return true;
         }
       }
-      return leafMet(leaf, profile);
+      return leafMet(leaf, profile, ctx);
     }
   }
 }
@@ -177,7 +197,7 @@ function nodePassesHard(
 // leafMet — pure boolean: does the student satisfy this leaf predicate?
 // ---------------------------------------------------------------------------
 
-function leafMet(leaf: LeafPredicate, profile: StudentProfile): boolean {
+function leafMet(leaf: LeafPredicate, profile: StudentProfile, ctx: EvalContext): boolean {
   switch (leaf.kind) {
     case "gpaAtLeast":
       return profile.gpa >= leaf.value;
@@ -209,7 +229,11 @@ function leafMet(leaf: LeafPredicate, profile: StudentProfile): boolean {
     case "citizenshipIn":
       return leaf.values.includes(profile.citizenship);
     case "deadlineAfter": {
-      const today = new Date().toISOString().slice(0, 10);
+      // For underclassmen (not in-cycle), treat any deadlineAfter leaf as met.
+      // The scholarship recurs annually; the student's application window is a
+      // future year, so a current-year "closed" deadline is irrelevant.
+      if (!ctx.isInCycle) return true;
+      const today = ctx.asOf.toISOString().slice(0, 10);
       return today <= leaf.date;
     }
     case "ethnicityIn": {
@@ -231,23 +255,25 @@ function leafMet(leaf: LeafPredicate, profile: StudentProfile): boolean {
 function evaluateAll(
   rules: EligibilityRuleSet[],
   profile: StudentProfile,
-  parentRequired: boolean
+  parentRequired: boolean,
+  ctx: EvalContext
 ): LeafResult[] {
   // In an `all` node every child must pass.  The parent's required-ness
   // propagates directly to every child.
-  return rules.flatMap((r) => evaluate(r, profile, parentRequired));
+  return rules.flatMap((r) => evaluate(r, profile, parentRequired, ctx));
 }
 
 function evaluateAny(
   rules: EligibilityRuleSet[],
   profile: StudentProfile,
-  parentRequired: boolean
+  parentRequired: boolean,
+  ctx: EvalContext
 ): LeafResult[] {
   // Evaluate every branch.
-  const branchResults = rules.map((r) => evaluate(r, profile, parentRequired));
+  const branchResults = rules.map((r) => evaluate(r, profile, parentRequired, ctx));
 
   // Compute node-level pass/fail using correct boolean logic for each branch.
-  const branchPasses = rules.map((r) => nodePassesHard(r, profile));
+  const branchPasses = rules.map((r) => nodePassesHard(r, profile, ctx));
   const anyBranchPasses = branchPasses.some(Boolean);
 
   if (anyBranchPasses) {
@@ -275,10 +301,11 @@ function evaluateAny(
 function evaluateNot(
   rule: EligibilityRuleSet,
   profile: StudentProfile,
-  parentRequired: boolean
+  parentRequired: boolean,
+  ctx: EvalContext
 ): LeafResult[] {
   // First determine the child's overall hard-gate result (De Morgan-correct).
-  const childPassesHard = nodePassesHard(rule, profile);
+  const childPassesHard = nodePassesHard(rule, profile, ctx);
 
   // NOT semantics: this node passes iff the child does NOT pass hard.
   const notPasses = !childPassesHard;
@@ -289,7 +316,7 @@ function evaluateNot(
     //   - met=true (we passed the not-gate so this is positive for us)
     //   - required=false (no disqualification needed)
     //   - plain-language negated description
-    const childLeaves = evaluate(rule, profile, false);
+    const childLeaves = evaluate(rule, profile, false, ctx);
     return childLeaves.map((lr) => ({
       ...lr,
       met: true,
@@ -300,7 +327,7 @@ function evaluateNot(
     // The NOT gate is NOT satisfied (child passed hard — that's bad here).
     // The student is excluded when parentRequired=true.
     // Collect child leaves, invert met, compute required from parentRequired.
-    const childLeaves = evaluate(rule, profile, false);
+    const childLeaves = evaluate(rule, profile, false, ctx);
     return childLeaves.map((lr) => ({
       ...lr,
       met: false,
@@ -334,7 +361,7 @@ function negatedDescription(lr: LeafResult): string {
     case "hasActivity":
       return `Not restricted to students with "${leaf.tag}" activity`;
     case "testAtLeast":
-      return `Not restricted to students with ${leaf.test.toUpperCase()} ≥ ${leaf.value}`;
+      return `Not restricted to students with ${leaf.test.toUpperCase()} >= ${leaf.value}`;
     case "deadlineAfter":
       return `Not restricted by the ${leaf.date} deadline`;
     case "ethnicityIn":
@@ -351,7 +378,8 @@ function negatedDescription(lr: LeafResult): string {
 function evaluateLeaf(
   leaf: LeafPredicate,
   profile: StudentProfile,
-  parentRequired: boolean
+  parentRequired: boolean,
+  ctx: EvalContext
 ): LeafResult {
   const isHard = leaf.weight === "hard";
   // A leaf is "required" only when its weight is hard AND the parent chain
@@ -449,7 +477,7 @@ function evaluateLeaf(
         met,
         required,
         description: met
-          ? `Need-based: your income band (${profile.householdIncomeBand}) is within the target range (≤${leaf.band})`
+          ? `Need-based: your income band (${profile.householdIncomeBand}) is within the target range (<=  ${leaf.band})`
           : `Income band (${profile.householdIncomeBand}) exceeds the need-based ceiling (${leaf.band})`,
       };
     }
@@ -484,8 +512,19 @@ function evaluateLeaf(
     }
 
     case "deadlineAfter": {
-      // Use today's date for deadline comparison
-      const today = new Date().toISOString().slice(0, 10);
+      // For underclassmen (not in-cycle), treat the deadlineAfter as met.
+      // The scholarship recurs annually; the current-year deadline is
+      // irrelevant for a student whose application window is a future year.
+      if (!ctx.isInCycle) {
+        return {
+          leaf,
+          met: true,
+          required: false,
+          description: `Deadline (${leaf.date}) — recurring annual; your window is a future year`,
+        };
+      }
+      // In-cycle: compare against today as before.
+      const today = ctx.asOf.toISOString().slice(0, 10);
       const met = today <= leaf.date;
       const daysUntil = Math.ceil(
         (new Date(leaf.date).getTime() - new Date(today).getTime()) /

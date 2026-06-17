@@ -24,7 +24,7 @@
 import type { AidRecord } from "@/lib/schemas/aid-record";
 import type { MatchResult, FeasibilityBand } from "@/lib/schemas/match-result";
 import type { StudentProfile } from "@/lib/schemas/student-profile";
-import { evaluate, isObtainable } from "./evaluate";
+import { evaluate, isObtainable, defaultCtx } from "./evaluate";
 import { computeScore } from "./score";
 import { buildExplanations } from "./explain";
 import {
@@ -45,13 +45,19 @@ import {
  *
  * @param profile  - Validated StudentProfile from the API request.
  * @param records  - AidRecord catalogue (loaded from DB or seed data).
+ * @param asOf     - Optional reference date (injectable for deterministic
+ *                   tests). Defaults to new Date() when omitted.
  * @returns        - Ranked MatchResult array, sorted by feasibilityScore descending.
  */
 export function matchProfile(
   profile: StudentProfile,
-  records: AidRecord[]
+  records: AidRecord[],
+  asOf?: Date
 ): MatchResult[] {
   const results: MatchResult[] = [];
+
+  // Build the evaluation context once per call — same clock for every award.
+  const ctx = defaultCtx(profile, asOf);
 
   for (const aid of records) {
     // -----------------------------------------------------------------------
@@ -62,9 +68,9 @@ export function matchProfile(
     if (schoolNote === "exclude") continue;
 
     // -----------------------------------------------------------------------
-    // Step 1: recursive evaluation
+    // Step 1: recursive evaluation (with cycle-aware context)
     // -----------------------------------------------------------------------
-    const leaves = evaluate(aid.eligibility, profile);
+    const leaves = evaluate(aid.eligibility, profile, true, ctx);
 
     // -----------------------------------------------------------------------
     // Step 2: hard filter
@@ -83,9 +89,15 @@ export function matchProfile(
     const band: FeasibilityBand = applySelectivityCap(rawBand, aid, profile);
 
     // -----------------------------------------------------------------------
-    // Step 5: explanations
+    // Step 5: explanations (cycle-aware deadline notes)
     // -----------------------------------------------------------------------
-    const { whyEligible, whyNotPerfect } = buildExplanations(leaves, aid);
+    const { whyEligible, whyNotPerfect } = buildExplanations(
+      leaves,
+      aid,
+      ctx.isInCycle,
+      profile.gradYear,
+      ctx.asOf
+    );
 
     // Append school-scope note if the award is school-scoped and targetSchools
     // were not provided (so we couldn't confirm the match).
