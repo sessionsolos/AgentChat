@@ -12,6 +12,21 @@ import { z } from "zod";
 import { IncomeBandSchema } from "./student-profile";
 
 // ---------------------------------------------------------------------------
+// InstitutionalAid — Pell, federal loan, and overall average net price
+// ---------------------------------------------------------------------------
+
+export const InstitutionalAidSchema = z.object({
+  /** Fraction (0–1) of undergrads receiving a Pell Grant (IPEDS PCTPELL) */
+  pellGrantRate: z.number().min(0).max(1).optional(),
+  /** Fraction (0–1) of undergrads receiving a federal loan (IPEDS PCTFLOAN) */
+  federalLoanRate: z.number().min(0).max(1).optional(),
+  /** Overall average net price in dollars (tuition + CoA - grants; not income-banded) */
+  avgNetPrice: z.number().nonnegative().optional(),
+}).optional();
+
+export type InstitutionalAid = z.infer<typeof InstitutionalAidSchema>;
+
+// ---------------------------------------------------------------------------
 // NetPriceByIncome — keyed by IncomeBand
 // ---------------------------------------------------------------------------
 
@@ -49,6 +64,8 @@ export const SchoolCostSchema = z.object({
   netPriceByIncome: NetPriceByIncomeSchema,
   /** Majors offered (free-text tags; may be empty) */
   majors: z.array(z.string()).optional(),
+  /** Institutional aid metrics sourced from IPEDS/Scorecard */
+  institutionalAid: InstitutionalAidSchema,
   source: z.object({
     sourceName: z.string(),
     sourceUrl: z.string().url(),
@@ -65,19 +82,26 @@ export type SchoolCost = z.infer<typeof SchoolCostSchema>;
 // SchoolsRequest — POST /api/schools request body
 // ---------------------------------------------------------------------------
 
-export const SchoolsRequestSchema = z.object({
-  /** 2-letter US state code — filters schools whose primary state is this */
-  state: z.string().length(2),
-  /** If provided, filter netPriceByIncome display to this band */
-  incomeBand: IncomeBandSchema.optional(),
-  /** If provided, prefer schools offering these majors (advisory filter) */
-  majors: z.array(z.string()).optional(),
-  /**
-   * When true, also include out-of-state schools relevant to a student
-   * in the requested state. Defaults to false.
-   */
-  includeOutOfState: z.boolean().optional(),
-});
+export const SchoolsRequestSchema = z
+  .object({
+    /** 2-letter US state code — filters schools whose primary state is this */
+    state: z.string().length(2).optional(),
+    /** College Scorecard unitids — fetch specific schools by id */
+    ids: z.array(z.string()).optional(),
+    /** If provided, filter netPriceByIncome display to this band */
+    incomeBand: IncomeBandSchema.optional(),
+    /** If provided, prefer schools offering these majors (advisory filter) */
+    majors: z.array(z.string()).optional(),
+    /**
+     * When true, also include out-of-state schools relevant to a student
+     * in the requested state. Defaults to false.
+     */
+    includeOutOfState: z.boolean().optional(),
+  })
+  .refine((data) => data.state != null || (data.ids != null && data.ids.length > 0), {
+    message: "At least one of 'state' or 'ids' must be provided",
+    path: ["state"],
+  });
 
 export type SchoolsRequest = z.infer<typeof SchoolsRequestSchema>;
 
