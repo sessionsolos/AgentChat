@@ -174,23 +174,45 @@ export function evaluate(
 // are genuinely required.
 // ---------------------------------------------------------------------------
 
+/**
+ * Compute the aggregate hard-gate boolean for a subtree.
+ *
+ * @param rule            - The rule node.
+ * @param profile         - The student profile.
+ * @param ctx             - Evaluation context.
+ * @param literalGradeOnly - When true, gradeLevelIn leaves are evaluated with
+ *   LITERAL set membership only (no forward-looking "below-grade passes" rule).
+ *   This must be true when called from evaluateNot so that negation of a
+ *   gradeLevelIn leaf uses the student's actual grade, not the forward-looking
+ *   gate.  When false (default, used from evaluateAny), the full leafMet()
+ *   logic is used, which allows below-grade students to pass as future-eligible.
+ *
+ * Fix 1: the two callers intentionally differ:
+ *   - evaluateAny  → literalGradeOnly=false  (forward-looking passes let a
+ *     junior "pass" a senior-only any-branch as future-eligible)
+ *   - evaluateNot  → literalGradeOnly=true   (a junior must NOT be treated as
+ *     a literal senior for the purpose of inverting the not-gate)
+ */
 function nodePassesHard(
   rule: EligibilityRuleSet,
   profile: StudentProfile,
-  ctx: EvalContext
+  ctx: EvalContext,
+  literalGradeOnly = false
 ): boolean {
   switch (rule.kind) {
     case "all":
       // AND: all children must pass hard.
-      return rule.rules.every((r) => nodePassesHard(r, profile, ctx));
+      return rule.rules.every((r) => nodePassesHard(r, profile, ctx, literalGradeOnly));
 
     case "any":
       // OR: at least one child must pass hard.
-      return rule.rules.some((r) => nodePassesHard(r, profile, ctx));
+      return rule.rules.some((r) => nodePassesHard(r, profile, ctx, literalGradeOnly));
 
     case "not":
       // NOT: pass iff child does NOT pass hard.
-      return !nodePassesHard(rule.rule, profile, ctx);
+      // Inside a not, always use literal grade — negation must always use
+      // literal membership regardless of outer context.
+      return !nodePassesHard(rule.rule, profile, ctx, true);
 
     default: {
       // Leaf: hard leaf must be met; soft leaf always passes the hard gate.
@@ -206,14 +228,12 @@ function nodePassesHard(
           return true;
         }
       }
-      // Fix 1: for gradeLevelIn, nodePassesHard must use LITERAL membership
-      // only — NOT the forward-looking "below passes" rule from leafMet().
-      // The forward-looking behavior (below-grade → future-eligible → met=true)
-      // is correct on the positive eligibility path, but it must NOT leak into
-      // negation or other hard-membership checks.  A junior is NOT literally a
-      // senior, so not(gradeLevelIn ["senior"]) must treat a junior as NOT
-      // matching the set — and therefore passing the NOT gate.
-      if (leaf.kind === "gradeLevelIn") {
+      // Fix 1: when in literal-grade-only mode (i.e., inside a not node),
+      // gradeLevelIn must use literal set membership, NOT the forward-looking
+      // "below-grade passes" rule.  A junior is not literally a senior, so
+      // not(gradeLevelIn ["senior"]) must see the junior as NOT matching and
+      // therefore pass the NOT gate.
+      if (literalGradeOnly && leaf.kind === "gradeLevelIn") {
         return leaf.values.includes(profile.gradeLevel);
       }
       return leafMet(leaf, profile, ctx);
@@ -307,19 +327,43 @@ function evaluateAny(
   const branchResults = rules.map((r) => evaluate(r, profile, parentRequired, ctx));
 
   // Compute node-level pass/fail using correct boolean logic for each branch.
-  const branchPasses = rules.map((r) => nodePassesHard(r, profile, ctx));
+  // Two flavors:
+  //   branchPasses       — forward-looking (below-grade → future-eligible)
+  //   branchPassesLiteral — literal-grade only (no forward-looking)
+  //
+  // Fix 2: when at least one branch passes with LITERAL grade membership, any
+  // branch that passes only via the forward-looking rule is treated as a
+  // non-winning branch (suppressed).  This prevents a future-grade leaf from
+  // a branch the student didn't actually rely on from triggering the future-
+  // grade penalty/cap when a sibling branch passes for real today.
+  const branchPasses = rules.map((r) => nodePassesHard(r, profile, ctx, false));
+  const branchPassesLiteral = rules.map((r) => nodePassesHard(r, profile, ctx, true));
   const anyBranchPasses = branchPasses.some(Boolean);
+  const anyBranchPassesLiteral = branchPassesLiteral.some(Boolean);
 
   if (anyBranchPasses) {
     // At least one branch passes. Downgrade hard-required unmet leaves in
     // the FAILING branches — they're alternative paths, not real gaps.
     return branchResults.flatMap((branchLeaves, idx) => {
-      if (branchPasses[idx]) {
-        // Passing branch: keep leaves as-is.
+      // A branch is considered "winning" for suppression purposes if:
+      //   - It passes in the standard (forward-looking) check, AND
+      //   - Either no branch passes literally (so forward-only passes are the
+      //     only wins, and they should all be kept), OR this branch itself also
+      //     passes literally (it's a real-today winner).
+      // When ANY branch passes literally, branches that pass only via the
+      // forward-looking rule are suppressed — the student is relying on the
+      // real branch, not the future-grade one.
+      const isWinning =
+        branchPasses[idx] &&
+        (!anyBranchPassesLiteral || branchPassesLiteral[idx]);
+
+      if (isWinning) {
+        // Winning branch: keep leaves as-is.
         return branchLeaves;
       }
-      // Failing branch: mark all leaves suppressed — they were an alternative
-      // path the student didn't need to take.
+      // Non-winning branch (failed, or forward-only when a real branch exists):
+      // mark all leaves suppressed — they were an alternative path the student
+      // didn't need to take (or shouldn't be relied upon).
       return branchLeaves.map((lr) => ({
         ...lr,
         required: false,
@@ -339,7 +383,9 @@ function evaluateNot(
   ctx: EvalContext
 ): LeafResult[] {
   // First determine the child's overall hard-gate result (De Morgan-correct).
-  const childPassesHard = nodePassesHard(rule, profile, ctx);
+  // Fix 1: pass literalGradeOnly=true so gradeLevelIn inside a not node uses
+  // literal set membership, not the forward-looking "below passes" rule.
+  const childPassesHard = nodePassesHard(rule, profile, ctx, true);
 
   // NOT semantics: this node passes iff the child does NOT pass hard.
   const notPasses = !childPassesHard;
