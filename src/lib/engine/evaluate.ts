@@ -206,6 +206,16 @@ function nodePassesHard(
           return true;
         }
       }
+      // Fix 1: for gradeLevelIn, nodePassesHard must use LITERAL membership
+      // only — NOT the forward-looking "below passes" rule from leafMet().
+      // The forward-looking behavior (below-grade → future-eligible → met=true)
+      // is correct on the positive eligibility path, but it must NOT leak into
+      // negation or other hard-membership checks.  A junior is NOT literally a
+      // senior, so not(gradeLevelIn ["senior"]) must treat a junior as NOT
+      // matching the set — and therefore passing the NOT gate.
+      if (leaf.kind === "gradeLevelIn") {
+        return leaf.values.includes(profile.gradeLevel);
+      }
       return leafMet(leaf, profile, ctx);
     }
   }

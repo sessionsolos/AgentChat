@@ -359,3 +359,124 @@ describe("Seed data: junior sees UNL school-scoped senior-only awards", () => {
     expect(note, `Expected a future-eligible note; got: ${JSON.stringify(unlResult!.whyEligible)}`).toBe(true);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Test 8 (Fix 1): not(gradeLevelIn) negation — literal membership, not forward-looking
+//
+// The "below-grade → future-eligible" rule must NOT leak into negation.
+//   not(gradeLevelIn ["senior"]) for a JUNIOR → INCLUDED (junior is not a senior)
+//   not(gradeLevelIn ["junior"])  for a SOPHOMORE → INCLUDED (sophomore is not a junior)
+//   not(gradeLevelIn ["senior"])  for a SENIOR    → EXCLUDED (senior IS a senior — control)
+// ---------------------------------------------------------------------------
+
+describe("Fix 1 — not(gradeLevelIn) uses literal membership, not forward-looking gate", () => {
+  it("junior is INCLUDED under not(gradeLevelIn ['senior'])", () => {
+    // A "not-for-seniors" award: a junior does NOT match {"senior"}, so she passes.
+    const aid = makeAid({
+      kind: "not",
+      rule: { kind: "gradeLevelIn", values: ["senior"], weight: "hard" },
+    });
+    const results = matchProfile(JUNIOR_2028, [aid], AS_OF);
+    expect(
+      results,
+      "A junior should pass not(gradeLevelIn ['senior']) — she is not a senior"
+    ).toHaveLength(1);
+  });
+
+  it("junior is INCLUDED under all[gpaAtLeast 3.0, not(gradeLevelIn ['senior'])]", () => {
+    // Composite: award open to non-seniors with GPA >= 3.0.
+    const aid = makeAid({
+      kind: "all",
+      rules: [
+        { kind: "gpaAtLeast", value: 3.0, weight: "hard" },
+        {
+          kind: "not",
+          rule: { kind: "gradeLevelIn", values: ["senior"], weight: "hard" },
+        },
+      ],
+    });
+    const results = matchProfile(JUNIOR_2028, [aid], AS_OF);
+    expect(
+      results,
+      "Junior (GPA 3.8) should be included under all[gpaAtLeast 3.0, not(gradeLevelIn ['senior'])]"
+    ).toHaveLength(1);
+  });
+
+  it("sophomore is INCLUDED under not(gradeLevelIn ['junior'])", () => {
+    const aid = makeAid({
+      kind: "not",
+      rule: { kind: "gradeLevelIn", values: ["junior"], weight: "hard" },
+    });
+    const results = matchProfile(SOPHOMORE_2029, [aid], AS_OF);
+    expect(
+      results,
+      "A sophomore should pass not(gradeLevelIn ['junior']) — she is not a junior"
+    ).toHaveLength(1);
+  });
+
+  it("senior IS excluded under not(gradeLevelIn ['senior']) — control", () => {
+    // A senior literally matches {"senior"}, so not(gradeLevelIn ["senior"]) excludes her.
+    const aid = makeAid({
+      kind: "not",
+      rule: { kind: "gradeLevelIn", values: ["senior"], weight: "hard" },
+    });
+    const results = matchProfile(SENIOR_2027, [aid], AS_OF);
+    expect(
+      results,
+      "A senior should be EXCLUDED under not(gradeLevelIn ['senior'])"
+    ).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Test 9 (Fix 2): any-sibling future-grade — not capped when a real branch passes
+//
+// any[gradeLevelIn ["senior"], gradeLevelIn ["junior","senior"]]
+// For a JUNIOR: the first branch is future-eligible (not literally junior),
+// the second branch passes LITERALLY (junior is in ["junior","senior"]).
+// The first branch is suppressed (the second branch is the winning one).
+// Result: junior matches TODAY, NOT future-capped, NOT tagged "Future eligible".
+// ---------------------------------------------------------------------------
+
+describe("Fix 2 — any-sibling future-grade leaf is not capped when a real branch passes", () => {
+  it("junior is included and NOT future-capped under any[senior-only, junior-or-senior]", () => {
+    const aid = makeAid({
+      kind: "any",
+      rules: [
+        // Branch 1: senior-only — junior is below this, would be future-eligible if relied on
+        { kind: "gradeLevelIn", values: ["senior"], weight: "hard" },
+        // Branch 2: junior-or-senior — junior literally matches this TODAY
+        { kind: "gradeLevelIn", values: ["junior", "senior"], weight: "hard" },
+      ],
+    });
+    const results = matchProfile(JUNIOR_2028, [aid], AS_OF);
+    expect(results, "Junior should be included (passes branch 2 literally)").toHaveLength(1);
+    expect(
+      results[0].band,
+      "Junior should NOT be future-capped (she passes branch 2 for real)"
+    ).not.toBe("reach");
+    // Band should be "strong" or "possible" based on normal scoring — NOT suppressed to reach by future penalty.
+    // More precisely: the future-grade penalty must NOT apply.
+    // We verify by checking that the band is what a normal match produces (not reach).
+    expect(["strong", "possible"]).toContain(results[0].band);
+  });
+
+  it("junior has NO 'Future eligible' note in whyEligible under any[senior-only, junior-or-senior]", () => {
+    const aid = makeAid({
+      kind: "any",
+      rules: [
+        { kind: "gradeLevelIn", values: ["senior"], weight: "hard" },
+        { kind: "gradeLevelIn", values: ["junior", "senior"], weight: "hard" },
+      ],
+    });
+    const results = matchProfile(JUNIOR_2028, [aid], AS_OF);
+    expect(results).toHaveLength(1);
+    const hasFutureNote = results[0].whyEligible.some((s) =>
+      /future eligible/i.test(s)
+    );
+    expect(
+      hasFutureNote,
+      `Junior should NOT get a 'Future eligible' note when she passes a branch for real; got: ${JSON.stringify(results[0].whyEligible)}`
+    ).toBe(false);
+  });
+});

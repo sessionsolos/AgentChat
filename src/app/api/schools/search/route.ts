@@ -18,7 +18,7 @@ import type { SchoolSearchResponse } from "@/lib/schemas/school-cost";
 import { searchSchoolsByName } from "@/lib/datasources/scorecard";
 
 const SearchRequestSchema = z.object({
-  q: z.string().min(1, "q must be a non-empty string"),
+  q: z.string().trim().min(2, "q must be at least 2 characters"),
 });
 
 export async function POST(request: NextRequest): Promise<NextResponse> {

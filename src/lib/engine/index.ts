@@ -90,7 +90,13 @@ export function matchProfile(
     const bandAfterSelectivity: FeasibilityBand = applySelectivityCap(rawBand, aid, profile);
     // Future-grade cap: an award the student cannot obtain in the current cycle
     // (they are below the required grade level) is capped at "possible".
-    const hasFutureGradeLeaf = leaves.some((lr) => lr._futureGrade === true);
+    // Fix 2: only count a future-grade leaf when the student did NOT also
+    // satisfy the award via a non-future (literal-membership) path.  A future-
+    // grade leaf inside a suppressed branch (i.e., the student relied on a
+    // different any-branch that passes for real) must not trigger the cap.
+    const hasFutureGradeLeaf = leaves.some(
+      (lr) => lr._futureGrade === true && lr._suppressed !== true
+    );
     const band: FeasibilityBand = hasFutureGradeLeaf && bandAfterSelectivity === "strong"
       ? FUTURE_GRADE_BAND_CAP
       : bandAfterSelectivity;

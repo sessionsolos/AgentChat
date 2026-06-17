@@ -1973,7 +1973,7 @@
     },
     "deadline": {
       "type": "date",
-      "date": "2026-05-01"
+      "date": "2026-12-01"
     },
     "applyUrl": "https://admissions.ku.edu/afford/scholarships",
     "sourceUrl": "https://admissions.ku.edu/afford/scholarships",

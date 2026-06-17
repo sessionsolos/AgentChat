@@ -108,7 +108,12 @@ export function computeScore(
   // Applied when a gradeLevelIn leaf was satisfied only because the student is
   // BELOW the required grade (future-eligible).  The award cannot be obtained
   // this cycle, so we dampen the score so it lands at most in "possible".
-  const hasFutureGradeLeaf = leaves.some((lr) => lr._futureGrade === true);
+  // Fix 2: ignore future-grade leaves that are suppressed (they came from a
+  // failing any-branch that the student did not rely on — a sibling branch
+  // passed for real, so the future-grade signal is not the reason they passed).
+  const hasFutureGradeLeaf = leaves.some(
+    (lr) => lr._futureGrade === true && lr._suppressed !== true
+  );
   const afterFutureGrade = hasFutureGradeLeaf
     ? afterEthnicity * FUTURE_GRADE_PENALTY
     : afterEthnicity;
