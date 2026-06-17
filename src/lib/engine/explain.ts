@@ -26,13 +26,23 @@ export interface Explanations {
 /**
  * Build explanation arrays from leaf evaluation results.
  *
- * @param leaves - All leaf results from evaluate().
- * @param aid    - The AidRecord (for deadline urgency checks).
- * @returns        { whyEligible, whyNotPerfect }
+ * @param leaves    - All leaf results from evaluate().
+ * @param aid       - The AidRecord (for deadline urgency checks).
+ * @param isInCycle - Whether the student is in their application cycle (senior
+ *                    year or later). When false (underclassman), past dated
+ *                    deadlines are treated as annual recurrences, not closures.
+ * @param gradYear  - The student's expected graduation year (used for the
+ *                    informational recurring-cycle message).
+ * @param asOf      - The reference date to use for "today" (injectable for
+ *                    testing; defaults to new Date() when omitted).
+ * @returns           { whyEligible, whyNotPerfect }
  */
 export function buildExplanations(
   leaves: LeafResult[],
-  aid: AidRecord
+  aid: AidRecord,
+  isInCycle: boolean,
+  gradYear: number,
+  asOf?: Date
 ): Explanations {
   const whyEligible: string[] = [];
   const whyNotPerfect: string[] = [];
@@ -54,7 +64,8 @@ export function buildExplanations(
 
   // Deadline urgency: surface a note if the deadline is within DEADLINE_WARN_DAYS
   // or has already passed, even when covered by a deadlineAfter leaf above.
-  const deadlineNote = buildDeadlineNote(aid);
+  // For underclassmen (not in-cycle), show a recurring-cycle note instead.
+  const deadlineNote = buildDeadlineNote(aid, isInCycle, gradYear, asOf);
   if (deadlineNote) {
     // Prepend so urgency is visible at the top.
     whyNotPerfect.unshift(deadlineNote);
@@ -67,10 +78,24 @@ export function buildExplanations(
 // Deadline urgency helper
 // ---------------------------------------------------------------------------
 
-function buildDeadlineNote(aid: AidRecord): string | null {
+/**
+ * Build a deadline note appropriate for the student's application cycle.
+ *
+ * - In-cycle (senior/applying now): surface passed-deadline warnings and
+ *   urgency notes as before.
+ * - Out-of-cycle (underclassman): do NOT label a past dated deadline as
+ *   "passed" or "closed". Instead, show an informational annual-recurrence
+ *   note with the student's expected application window.
+ */
+function buildDeadlineNote(
+  aid: AidRecord,
+  isInCycle: boolean,
+  gradYear: number,
+  asOf?: Date
+): string | null {
   if (aid.deadline.type !== "date") return null;
 
-  const today = new Date();
+  const today = asOf ? new Date(asOf) : new Date();
   today.setHours(0, 0, 0, 0);
   const deadlineDate = new Date(aid.deadline.date);
   deadlineDate.setHours(0, 0, 0, 0);
@@ -79,6 +104,15 @@ function buildDeadlineNote(aid: AidRecord): string | null {
     (deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
   );
 
+  if (!isInCycle) {
+    // Underclassman: treat any dated deadline as a recurring annual window.
+    // Extract Month name from the deadline date for the informational note.
+    const month = deadlineDate.toLocaleString("en-US", { month: "long" });
+    const applicationYear = gradYear - 1;
+    return `Annual deadline (~${month}); your application window is your senior year (~${applicationYear})`;
+  }
+
+  // In-cycle behavior (unchanged):
   if (daysUntil < 0) {
     return `Deadline has already passed (${aid.deadline.date}) — check for updated dates`;
   }

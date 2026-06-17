@@ -190,45 +190,65 @@ export function ResultCard({ result }: { result: MatchResult }) {
       </div>
 
       {/* Footer: citation + apply */}
-      <div className="px-5 pb-5 flex flex-wrap items-center justify-between gap-3">
-        {/* Citation */}
-        <p className="text-xs text-gray-400">
-          Source:{" "}
-          <a
-            href={citation.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-gray-600 transition-colors"
+      <div className="px-5 pb-5 space-y-3">
+        {/* Verified source — prominent, clickable */}
+        <div className="flex items-start gap-2 rounded-lg bg-green-50 border border-green-200 px-3 py-2">
+          <svg
+            className="w-4 h-4 text-green-600 mt-0.5 shrink-0"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            aria-hidden="true"
           >
-            {citation.sourceName} ↗
-          </a>
-          {" · "}verified {citation.lastVerifiedAt}
-        </p>
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <div className="flex-1 min-w-0">
+            <span className="text-xs font-semibold text-green-800">
+              Verified source:{" "}
+            </span>
+            <a
+              href={citation.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold text-green-700 underline underline-offset-2 hover:text-green-900 transition-colors break-all"
+            >
+              {citation.sourceName} &#8599;
+            </a>
+            <span className="text-xs text-green-700">
+              {" "}&#8212; verified {citation.lastVerifiedAt}
+            </span>
+          </div>
+        </div>
 
         {/* Apply button */}
         {aid.applyUrl && (
-          <a
-            href={aid.applyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-700 text-white text-sm font-semibold hover:bg-blue-800 active:bg-blue-900 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-          >
-            Apply
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
+          <div className="flex justify-end">
+            <a
+              href={aid.applyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-700 text-white text-sm font-semibold hover:bg-blue-800 active:bg-blue-900 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-              />
-            </svg>
-          </a>
+              Apply
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+            </a>
+          </div>
         )}
       </div>
     </article>

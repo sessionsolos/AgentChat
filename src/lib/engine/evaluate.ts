@@ -67,6 +67,27 @@ export interface LeafResult {
 }
 
 // ---------------------------------------------------------------------------
+// EvalContext — shared evaluation context passed through the tree walk
+// ---------------------------------------------------------------------------
+
+/**
+ * Context passed through the recursive evaluation tree.
+ *
+ * isInCycle: whether the student is currently in their application cycle
+ *   (i.e., current calendar year ≥ gradYear - 1).  When false, a
+ *   deadlineAfter leaf whose date has passed in the current year is treated
+ *   as met (no hard-block) because the scholarship recurs annually and the
+ *   student's actual application window is in a future year.
+ *
+ * asOf: the reference date to use instead of new Date() — injectable for
+ *   deterministic tests.
+ */
+export interface EvalContext {
+  isInCycle: boolean;
+  asOf: Date;
+}
+
+// ---------------------------------------------------------------------------
 // evaluate — returns all leaf results flattened, each tagged with whether
 // it was truly required by the tree structure.
 // ---------------------------------------------------------------------------
@@ -79,26 +100,30 @@ export interface LeafResult {
  * @param parentRequired - Whether the current node is required (hard) by its
  *                       parent chain.  Defaults to true (top-level all nodes
  *                       are always required).
+ * @param ctx         - Evaluation context (isInCycle, asOf). Optional; when
+ *                       omitted defaults are derived from new Date().
  * @returns             - Flat array of LeafResult.
  */
 export function evaluate(
   rule: EligibilityRuleSet,
   profile: StudentProfile,
-  parentRequired = true
+  parentRequired = true,
+  ctx?: EvalContext
 ): LeafResult[] {
+  const resolvedCtx = ctx ?? defaultCtx(profile);
   switch (rule.kind) {
     case "all":
-      return evaluateAll(rule.rules, profile, parentRequired);
+      return evaluateAll(rule.rules, profile, parentRequired, resolvedCtx);
 
     case "any":
-      return evaluateAny(rule.rules, profile, parentRequired);
+      return evaluateAny(rule.rules, profile, parentRequired, resolvedCtx);
 
     case "not":
-      return evaluateNot(rule.rule, profile, parentRequired);
+      return evaluateNot(rule.rule, profile, parentRequired, resolvedCtx);
 
     default:
       // Leaf predicate
-      return [evaluateLeaf(rule as LeafPredicate, profile, parentRequired)];
+      return [evaluateLeaf(rule as LeafPredicate, profile, parentRequired, resolvedCtx)];
   }
 }
 

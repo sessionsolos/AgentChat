@@ -1,6 +1,7 @@
 import type { MatchResult, FeasibilityBand } from "@/lib/schemas";
 import { ResultCard } from "./ResultCard";
 import { Disclaimer } from "./Disclaimer";
+import { AboutDataNote } from "./AboutDataNote";
 
 interface ResultsPanelProps {
   results: MatchResult[];
@@ -84,6 +85,8 @@ export function ResultsPanel({ results, generatedAt }: ResultsPanelProps) {
       </div>
 
       <Disclaimer compact />
+
+      <AboutDataNote />
 
       {BAND_ORDER.map((band) => {
         const group = byBand[band];

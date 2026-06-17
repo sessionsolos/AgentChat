@@ -205,18 +205,73 @@ function DataSourceNotice({
 }) {
   if (dataSource === "live") {
     return (
-      <p className="text-xs text-green-800 bg-green-50 border border-green-200 rounded px-3 py-2">
-        <strong>Live data</strong> &#8212; sourced from the College Scorecard API (api.data.gov).
-      </p>
+      <div className="flex items-center gap-3 rounded-lg bg-green-50 border border-green-300 px-4 py-3">
+        <span className="inline-flex items-center gap-1.5 shrink-0 rounded-full bg-green-600 px-2.5 py-1 text-xs font-bold text-white uppercase tracking-wide">
+          <svg
+            className="w-3.5 h-3.5"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Live data
+        </span>
+        <p className="text-sm text-green-900">
+          <strong>U.S. Dept. of Education College Scorecard</strong> &#8212;{" "}
+          costs are pulled live from the federal database.{" "}
+          <a
+            href="https://collegescorecard.ed.gov/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-green-700 transition-colors"
+          >
+            collegescorecard.ed.gov &#8599;
+          </a>
+        </p>
+      </div>
     );
   }
   return (
-    <p className="text-xs text-blue-800 bg-blue-50 border border-blue-200 rounded px-3 py-2">
-      <strong>Sample data</strong> &#8212; add a free api.data.gov key (
-      <code className="font-mono">DATA_GOV_API_KEY</code>) to your{" "}
-      <code className="font-mono">.env.local</code> for live results from the
-      College Scorecard.
-    </p>
+    <div className="flex items-start gap-3 rounded-lg bg-amber-50 border border-amber-300 px-4 py-3">
+      <span className="inline-flex items-center gap-1.5 shrink-0 rounded-full bg-amber-500 px-2.5 py-1 text-xs font-bold text-white uppercase tracking-wide mt-0.5">
+        <svg
+          className="w-3.5 h-3.5"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          aria-hidden="true"
+        >
+          <path
+            fillRule="evenodd"
+            d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+            clipRule="evenodd"
+          />
+        </svg>
+        Sample data
+      </span>
+      <p className="text-sm text-amber-900">
+        These are representative sample figures.{" "}
+        <strong>
+          Add a free{" "}
+          <a
+            href="https://api.data.gov/signup/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-amber-700 transition-colors"
+          >
+            api.data.gov &#8599;
+          </a>{" "}
+          key
+        </strong>{" "}
+        (<code className="font-mono text-xs">DATA_GOV_API_KEY</code> in{" "}
+        <code className="font-mono text-xs">.env.local</code>) to load live
+        College Scorecard costs.
+      </p>
+    </div>
   );
 }
 
