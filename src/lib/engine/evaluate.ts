@@ -21,7 +21,7 @@ import type {
   EligibilityRuleSet,
   LeafPredicate,
 } from "@/lib/schemas/eligibility";
-import type { StudentProfile, IncomeBand } from "@/lib/schemas/student-profile";
+import type { StudentProfile, IncomeBand, GradeLevel } from "@/lib/schemas/student-profile";
 
 // ---------------------------------------------------------------------------
 // Income band ordering (low → high)
@@ -37,6 +37,16 @@ const INCOME_BAND_ORDER: IncomeBand[] = [
 
 function incomeBandIndex(band: IncomeBand): number {
   return INCOME_BAND_ORDER.indexOf(band);
+}
+
+// ---------------------------------------------------------------------------
+// Grade level ordering (sophomore < junior < senior)
+// ---------------------------------------------------------------------------
+
+const GRADE_LEVEL_ORDER: GradeLevel[] = ["sophomore", "junior", "senior"];
+
+function gradeLevelOrdinal(grade: GradeLevel): number {
+  return GRADE_LEVEL_ORDER.indexOf(grade);
 }
 
 // ---------------------------------------------------------------------------
@@ -64,6 +74,14 @@ export interface LeafResult {
    * Suppressed leaves should not appear in whyNotPerfect.
    */
   _suppressed?: boolean;
+  /**
+   * True when this is a gradeLevelIn leaf that the student passes only because
+   * they are BELOW the required grade level (future-eligible).
+   * The leaf is treated as met (met=true) so it does not hard-filter the award,
+   * but the score is dampened and the band is capped so the award cannot rank
+   * "strong" in the current cycle.
+   */
+  _futureGrade?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -209,8 +227,14 @@ function leafMet(leaf: LeafPredicate, profile: StudentProfile, ctx: EvalContext)
       if (score === undefined) return false; // missing → not met (but will be treated as soft gap in LeafResult)
       return score >= leaf.value;
     }
-    case "gradeLevelIn":
-      return leaf.values.includes(profile.gradeLevel);
+    case "gradeLevelIn": {
+      if (leaf.values.includes(profile.gradeLevel)) return true;
+      // BELOW the required range → future-eligible: treat as passing the hard gate.
+      // (ABOVE the range → genuinely aged out → not met.)
+      const studentOrdinal = gradeLevelOrdinal(profile.gradeLevel);
+      const minRequired = Math.min(...leaf.values.map(gradeLevelOrdinal));
+      return studentOrdinal < minRequired; // BELOW → future-eligible → passes
+    }
     case "residencyState":
       return profile.homeState === leaf.state;
     case "majorIn": {
@@ -429,14 +453,47 @@ function evaluateLeaf(
     }
 
     case "gradeLevelIn": {
-      const met = leaf.values.includes(profile.gradeLevel);
+      // Exact match → currently eligible.
+      if (leaf.values.includes(profile.gradeLevel)) {
+        return {
+          leaf,
+          met: true,
+          required,
+          description: `Open to ${leaf.values.join("/")} students (you: ${profile.gradeLevel})`,
+        };
+      }
+
+      const studentOrdinal = gradeLevelOrdinal(profile.gradeLevel);
+      const requiredOrdinals = leaf.values.map(gradeLevelOrdinal);
+      const minRequired = Math.min(...requiredOrdinals);
+
+      if (studentOrdinal < minRequired) {
+        // Student is BELOW the required grade → future-eligible.
+        // Treat as met so the award is not hard-filtered; flag with _futureGrade
+        // so score.ts can dampen and index.ts can cap the band.
+        const lowestRequired = GRADE_LEVEL_ORDER[minRequired];
+        // Approximate the cycle year: the "lowestRequired" grade falls
+        // (lowestRequired - studentOrdinal) academic years from now.
+        // A senior's cycle year is gradYear - 1. We don't have gradYear here
+        // (it's on the profile but not on the leaf), so we embed only the
+        // required grade name in the leaf description.  The caller (explain.ts
+        // or whyEligible) can display the grade; the cycle year suffix is
+        // added by index.ts after reading profile.gradYear.
+        return {
+          leaf,
+          met: true,     // treated as met so it doesn't hard-block
+          required: false, // not a disqualification — forward-looking
+          description: `Future eligible: you'll qualify as a ${lowestRequired} (you are currently ${profile.gradeLevel})`,
+          _futureGrade: true,
+        };
+      }
+
+      // Student is ABOVE the required range → genuinely aged out → hard exclusion.
       return {
         leaf,
-        met,
+        met: false,
         required,
-        description: met
-          ? `Open to ${leaf.values.join("/")} students (you: ${profile.gradeLevel})`
-          : `Grade level not eligible (requires: ${leaf.values.join(" or ")}, you: ${profile.gradeLevel})`,
+        description: `Grade level not eligible (requires: ${leaf.values.join(" or ")}, you: ${profile.gradeLevel})`,
       };
     }
 

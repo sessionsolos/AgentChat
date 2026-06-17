@@ -34,6 +34,7 @@ import {
   EXCEPTIONAL_GPA_FLOOR,
   EXCEPTIONAL_SAT_FLOOR,
   EXCEPTIONAL_ACT_FLOOR,
+  FUTURE_GRADE_BAND_CAP,
 } from "./weights";
 
 // ---------------------------------------------------------------------------
@@ -83,10 +84,16 @@ export function matchProfile(
     const feasibilityScore = computeScore(leaves, profile, aid);
 
     // -----------------------------------------------------------------------
-    // Step 4: band (with selectivity cap for highly_selective awards)
+    // Step 4: band (with selectivity cap + future-grade cap)
     // -----------------------------------------------------------------------
     const rawBand: FeasibilityBand = scoreToBand(feasibilityScore);
-    const band: FeasibilityBand = applySelectivityCap(rawBand, aid, profile);
+    const bandAfterSelectivity: FeasibilityBand = applySelectivityCap(rawBand, aid, profile);
+    // Future-grade cap: an award the student cannot obtain in the current cycle
+    // (they are below the required grade level) is capped at "possible".
+    const hasFutureGradeLeaf = leaves.some((lr) => lr._futureGrade === true);
+    const band: FeasibilityBand = hasFutureGradeLeaf && bandAfterSelectivity === "strong"
+      ? FUTURE_GRADE_BAND_CAP
+      : bandAfterSelectivity;
 
     // -----------------------------------------------------------------------
     // Step 5: explanations (cycle-aware deadline notes)
@@ -98,6 +105,19 @@ export function matchProfile(
       profile.gradYear,
       ctx.asOf
     );
+
+    // For future-grade leaves, enrich the whyEligible description with the
+    // specific cycle year so the student knows WHEN she'll be eligible.
+    // The leaf description already identifies the required grade; we append
+    // the approximate cycle year (gradYear - 1 for a "senior" cycle).
+    if (hasFutureGradeLeaf) {
+      const applicationYear = profile.gradYear - 1;
+      for (let i = 0; i < whyEligible.length; i++) {
+        if (whyEligible[i].startsWith("Future eligible:")) {
+          whyEligible[i] += ` (~senior-year cycle ${applicationYear})`;
+        }
+      }
+    }
 
     // Append school-scope note if the award is school-scoped and targetSchools
     // were not provided (so we couldn't confirm the match).

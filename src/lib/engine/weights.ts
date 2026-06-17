@@ -130,3 +130,26 @@ export const EXCEPTIONAL_ACT_FLOOR = 34;
  * Prevents heritage-gated awards from sitting at the top of results.
  */
 export const ETHNICITY_UNKNOWN_PENALTY = 0.65;
+
+// ---------------------------------------------------------------------------
+// Future-grade dampening
+//
+// When a gradeLevelIn leaf is satisfied only because the student is BELOW the
+// required grade level (future-eligible), the award cannot be obtained in the
+// current cycle.  Apply a score multiplier so the award lands below "strong".
+// The band is also hard-capped at "possible" in index.ts (same pattern as the
+// highly_selective cap) so that future-eligible awards are never ranked "strong".
+// ---------------------------------------------------------------------------
+
+/**
+ * Score multiplier applied when a future-grade leaf is present.
+ * Chosen to reliably pull even a highly-scoring student below the STRONG_THRESHOLD
+ * (80 pts × 0.7 = 56 pts → "possible").
+ */
+export const FUTURE_GRADE_PENALTY = 0.7;
+
+/**
+ * Hard band ceiling for awards that the student cannot obtain this cycle due
+ * to grade level (future-eligible).  Mirrors HIGHLY_SELECTIVE_BAND_CAP.
+ */
+export const FUTURE_GRADE_BAND_CAP = "possible" as const;

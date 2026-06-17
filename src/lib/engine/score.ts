@@ -32,6 +32,7 @@ import {
   HIGH_AWARD_THRESHOLD,
   SELECTIVITY_MULTIPLIER,
   ETHNICITY_UNKNOWN_PENALTY,
+  FUTURE_GRADE_PENALTY,
 } from "./weights";
 
 // ---------------------------------------------------------------------------
@@ -103,8 +104,17 @@ export function computeScore(
     ? afterSelectivity * ETHNICITY_UNKNOWN_PENALTY
     : afterSelectivity;
 
+  // Phase 4: future-grade penalty
+  // Applied when a gradeLevelIn leaf was satisfied only because the student is
+  // BELOW the required grade (future-eligible).  The award cannot be obtained
+  // this cycle, so we dampen the score so it lands at most in "possible".
+  const hasFutureGradeLeaf = leaves.some((lr) => lr._futureGrade === true);
+  const afterFutureGrade = hasFutureGradeLeaf
+    ? afterEthnicity * FUTURE_GRADE_PENALTY
+    : afterEthnicity;
+
   // Clamp to [0, 100] and round to one decimal.
-  return Math.round(Math.min(100, Math.max(0, afterEthnicity)) * 10) / 10;
+  return Math.round(Math.min(100, Math.max(0, afterFutureGrade)) * 10) / 10;
 }
 
 // ---------------------------------------------------------------------------

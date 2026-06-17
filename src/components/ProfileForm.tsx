@@ -13,6 +13,8 @@ import { TagInput, type QuickAddItem } from "./TagInput";
 import { FieldError } from "./FieldError";
 import { ResultsPanel } from "./ResultsPanel";
 import { SchoolCostPanel } from "./SchoolCostPanel";
+import { SchoolSearchPicker, type SelectedSchool } from "./SchoolSearchPicker";
+import { SelectedSchoolsPanel } from "./SelectedSchoolsPanel";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -117,6 +119,7 @@ interface FormState {
   genderIdentity: string;
   ethnicityTags: string[];
   militaryAffiliation: string;
+  targetSchools: SelectedSchool[];
 }
 
 const INITIAL_STATE: FormState = {
@@ -136,6 +139,7 @@ const INITIAL_STATE: FormState = {
   genderIdentity: "",
   ethnicityTags: [],
   militaryAffiliation: "",
+  targetSchools: [],
 };
 
 // ---------------------------------------------------------------------------
@@ -239,6 +243,11 @@ function buildProfile(s: FormState): unknown {
     gpaScale: 4.0,
     testScores,
     intendedMajors: s.intendedMajors,
+    // Include selected school ids so /api/match can return school-scoped scholarships.
+    targetSchoolIds:
+      s.targetSchools.length > 0
+        ? s.targetSchools.map((school) => school.id)
+        : undefined,
     householdIncomeBand: s.householdIncomeBand || undefined,
     dependentStatus: s.dependentStatus || undefined,
     householdSize:

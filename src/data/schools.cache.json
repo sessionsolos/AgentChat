@@ -14,11 +14,16 @@
       "75-110k": 19663,
       "110k+": 20947
     },
+    "institutionalAid": {
+      "pellGrantRate": 0.24,
+      "federalLoanRate": 0.40,
+      "avgNetPrice": 18029
+    },
     "majors": [],
     "source": {
-      "sourceName": "College Scorecard / NCES IPEDS — aggregated via The College Monk & search data 2022-23",
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; pell/loan via EDsmart & CollegeSimply aggregated IPEDS",
       "sourceUrl": "https://collegescorecard.ed.gov/school/?181464-University-of-Nebraska-Lincoln=",
-      "lastVerifiedAt": "2026-06-16"
+      "lastVerifiedAt": "2026-06-17"
     },
     "dataSource": "cached"
   },
@@ -39,9 +44,9 @@
     },
     "majors": [],
     "source": {
-      "sourceName": "College Scorecard / NCES IPEDS — aggregated via DecideMyCampus & search data 2022-23",
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23 aggregated via DecideMyCampus & search data",
       "sourceUrl": "https://collegescorecard.ed.gov/school/?181394-University-of-Nebraska-at-Omaha=",
-      "lastVerifiedAt": "2026-06-16"
+      "lastVerifiedAt": "2026-06-17"
     },
     "dataSource": "cached"
   },
@@ -59,9 +64,9 @@
     },
     "majors": [],
     "source": {
-      "sourceName": "College Scorecard / NCES IPEDS — aggregated via College Simply & search data 2022-23",
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23 aggregated via College Simply & search data",
       "sourceUrl": "https://collegescorecard.ed.gov/school/?181215-University-of-Nebraska-at-Kearney=",
-      "lastVerifiedAt": "2026-06-16"
+      "lastVerifiedAt": "2026-06-17"
     },
     "dataSource": "cached"
   },
@@ -79,9 +84,112 @@
     },
     "majors": [],
     "source": {
-      "sourceName": "College Scorecard / NCES IPEDS — aggregated via TuitionTracker & search data 2022-23",
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23 aggregated via TuitionTracker & search data",
       "sourceUrl": "https://collegescorecard.ed.gov/school/?181002-Creighton-University=",
-      "lastVerifiedAt": "2026-06-16"
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "181446",
+    "name": "Nebraska Wesleyan University",
+    "city": "Lincoln",
+    "state": "NE",
+    "control": "private",
+    "tuitionInState": 39536,
+    "tuitionOutOfState": 39536,
+    "netPriceByIncome": {
+      "30-48k": 20117,
+      "110k+": 29708
+    },
+    "institutionalAid": {
+      "pellGrantRate": 0.38,
+      "avgNetPrice": 18327
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; net price by income via CollegeSimply aggregated IPEDS; pell via CollegeSimply IPEDS 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?181446-Nebraska-Wesleyan-University=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "181020",
+    "name": "Doane University",
+    "city": "Crete",
+    "state": "NE",
+    "control": "private",
+    "tuitionInState": 39336,
+    "tuitionOutOfState": 39336,
+    "netPriceByIncome": {},
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition via CollegeTuitionCompare IPEDS 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?181020-Doane-University=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "181127",
+    "name": "Hastings College",
+    "city": "Hastings",
+    "state": "NE",
+    "control": "private",
+    "tuitionInState": 33950,
+    "tuitionOutOfState": 33950,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.32,
+      "avgNetPrice": 21347
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition & avg net price via CollegeSimply aggregated IPEDS; pell via CollegeSimply IPEDS 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?181127-Hastings-College=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "181783",
+    "name": "Wayne State College",
+    "city": "Wayne",
+    "state": "NE",
+    "control": "public",
+    "tuitionInState": 5760,
+    "tuitionOutOfState": 5760,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "avgNetPrice": 14428
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition same in/out-of-state per WSC policy; avg net price via CollegeSimply IPEDS 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?181783-Wayne-State-College=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "180948",
+    "name": "Chadron State College",
+    "city": "Chadron",
+    "state": "NE",
+    "control": "public",
+    "tuitionInState": 5720,
+    "tuitionOutOfState": 5720,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.39,
+      "avgNetPrice": 15147
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition same in/out-of-state; pell & avg net price via CollegeSimply IPEDS 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?180948-Chadron-State-College=",
+      "lastVerifiedAt": "2026-06-17"
     },
     "dataSource": "cached"
   },
@@ -96,9 +204,9 @@
     "netPriceByIncome": {},
     "majors": [],
     "source": {
-      "sourceName": "College Scorecard / NCES IPEDS — tuition from IPEDS 2024-25; net price by income not verified at bracket level",
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition from IPEDS 2024-25; net price by income not verified at bracket level",
       "sourceUrl": "https://collegescorecard.ed.gov/school/?153658-University-of-Iowa=",
-      "lastVerifiedAt": "2026-06-16"
+      "lastVerifiedAt": "2026-06-17"
     },
     "dataSource": "cached"
   },
@@ -119,9 +227,9 @@
     },
     "majors": [],
     "source": {
-      "sourceName": "College Scorecard / NCES IPEDS — aggregated via EDsmart & search data 2022-23",
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23 aggregated via EDsmart & search data",
       "sourceUrl": "https://collegescorecard.ed.gov/school/?155317-University-of-Kansas=",
-      "lastVerifiedAt": "2026-06-16"
+      "lastVerifiedAt": "2026-06-17"
     },
     "dataSource": "cached"
   },
@@ -138,9 +246,9 @@
     },
     "majors": [],
     "source": {
-      "sourceName": "College Scorecard / NCES IPEDS — tuition from IPEDS 2024-25; net price partial via search data 2022-23",
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition from IPEDS 2024-25; net price partial via search data",
       "sourceUrl": "https://collegescorecard.ed.gov/school/?178396-University-of-Missouri-Columbia=",
-      "lastVerifiedAt": "2026-06-16"
+      "lastVerifiedAt": "2026-06-17"
     },
     "dataSource": "cached"
   },
@@ -158,9 +266,318 @@
     },
     "majors": [],
     "source": {
-      "sourceName": "College Scorecard / NCES IPEDS — aggregated via College Simply & search data 2022-23",
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23 aggregated via College Simply & search data",
       "sourceUrl": "https://collegescorecard.ed.gov/school/?219356-South-Dakota-State-University=",
-      "lastVerifiedAt": "2026-06-16"
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "204796",
+    "name": "Ohio State University–Main Campus",
+    "city": "Columbus",
+    "state": "OH",
+    "control": "public",
+    "tuitionInState": 12859,
+    "tuitionOutOfState": 38365,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.18,
+      "federalLoanRate": 0.32,
+      "avgNetPrice": 17339
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition, pell, loan rate via CollegeSimply & Scholarships360 aggregated IPEDS; avg net price via Scorecard 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?204796-Ohio-State-University-Main-Campus=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "170976",
+    "name": "University of Michigan–Ann Arbor",
+    "city": "Ann Arbor",
+    "state": "MI",
+    "control": "public",
+    "tuitionInState": 19497,
+    "tuitionOutOfState": 66203,
+    "netPriceByIncome": {
+      "0-30k": 1173
+    },
+    "institutionalAid": {
+      "pellGrantRate": 0.18,
+      "avgNetPrice": 19205
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition, pell, 0-30k net price via CollegeSimply & Scorecard 2022-23; avg net price via Scorecard data",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?170976-University-of-Michigan-Ann-Arbor=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "214777",
+    "name": "Pennsylvania State University–Main Campus",
+    "city": "University Park",
+    "state": "PA",
+    "control": "public",
+    "tuitionInState": 19286,
+    "tuitionOutOfState": 38102,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.13
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition from IPEDS 2022-23 Board-approved budget; pell via CollegeSimply IPEDS 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?214777-Pennsylvania-State-University-Main-Campus=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "228723",
+    "name": "University of Texas at Austin",
+    "city": "Austin",
+    "state": "TX",
+    "control": "public",
+    "tuitionInState": 11678,
+    "tuitionOutOfState": 42778,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.27,
+      "federalLoanRate": 0.29
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition, pell & loan rate via CollegeSimply & Scholarships360 aggregated IPEDS",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?228723-University-of-Texas-at-Austin=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "110662",
+    "name": "University of California–Los Angeles",
+    "city": "Los Angeles",
+    "state": "CA",
+    "control": "public",
+    "tuitionInState": 13258,
+    "tuitionOutOfState": 43254,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.27,
+      "avgNetPrice": 15166
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; pell via UCLA newsroom Scorecard data; in-state tuition via UCLA 2020-21 (nearest verified); avg net price via CollegeCAlc/Scorecard 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?110662-University-of-California-Los-Angeles=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "166027",
+    "name": "Harvard University",
+    "city": "Cambridge",
+    "state": "MA",
+    "control": "private",
+    "tuitionInState": 57261,
+    "tuitionOutOfState": 57261,
+    "netPriceByIncome": {
+      "0-30k": 2382
+    },
+    "institutionalAid": {
+      "pellGrantRate": 0.16,
+      "federalLoanRate": 0.04,
+      "avgNetPrice": 15411
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; pell & loan rate via CollegeSimply aggregated IPEDS; 0-30k net price via College Transitions/Scorecard; avg net price via DeepColleges/Scorecard 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?166027-Harvard-University=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "243744",
+    "name": "Stanford University",
+    "city": "Stanford",
+    "state": "CA",
+    "control": "private",
+    "tuitionInState": 57803,
+    "tuitionOutOfState": 57803,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.20,
+      "avgNetPrice": 14402
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; pell via CollegeSimply aggregated IPEDS; avg net price via CollegeSimply/Scorecard 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?243744-Stanford-University=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "166683",
+    "name": "Massachusetts Institute of Technology",
+    "city": "Cambridge",
+    "state": "MA",
+    "control": "private",
+    "tuitionInState": 57986,
+    "tuitionOutOfState": 57986,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "avgNetPrice": 22687
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; avg net price via CollegeSimply aggregated IPEDS 2022-23",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?166683-Massachusetts-Institute-of-Technology=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "186380",
+    "name": "Princeton University",
+    "city": "Princeton",
+    "state": "NJ",
+    "control": "private",
+    "tuitionInState": 57410,
+    "tuitionOutOfState": 57410,
+    "netPriceByIncome": {
+      "0-30k": 0
+    },
+    "institutionalAid": {
+      "pellGrantRate": 0.22,
+      "federalLoanRate": 0.00
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; pell via CollegeSimply aggregated IPEDS; 0-30k $0 via Scorecard/USNews; Princeton no-loan policy (federal_loan_rate = 0)",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?186380-Princeton-University=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "190150",
+    "name": "New York University",
+    "city": "New York",
+    "state": "NY",
+    "control": "private",
+    "tuitionInState": 58168,
+    "tuitionOutOfState": 58168,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.26
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition & pell via CollegeSimply aggregated IPEDS",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?190150-New-York-University=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "145637",
+    "name": "University of Illinois Urbana-Champaign",
+    "city": "Champaign",
+    "state": "IL",
+    "control": "public",
+    "tuitionInState": 15880,
+    "tuitionOutOfState": 33680,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.25
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition & pell via CollegeSimply aggregated IPEDS",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?145637-University-of-Illinois-Urbana-Champaign=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "240444",
+    "name": "University of Wisconsin–Madison",
+    "city": "Madison",
+    "state": "WI",
+    "control": "public",
+    "tuitionInState": 11415,
+    "tuitionOutOfState": 40227,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.16
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition & pell via CollegeSimply aggregated IPEDS",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?240444-University-of-Wisconsin-Madison=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "126614",
+    "name": "University of Colorado Boulder",
+    "city": "Boulder",
+    "state": "CO",
+    "control": "public",
+    "tuitionInState": 14108,
+    "tuitionOutOfState": 40464,
+    "netPriceByIncome": {},
+    "institutionalAid": {
+      "pellGrantRate": 0.20
+    },
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition & pell via CollegeSimply aggregated IPEDS",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?126614-University-of-Colorado-Boulder=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "181121",
+    "name": "University of Nebraska Medical Center",
+    "city": "Omaha",
+    "state": "NE",
+    "control": "public",
+    "tuitionInState": 9075,
+    "tuitionOutOfState": 24525,
+    "netPriceByIncome": {},
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition via UNMC official cost page",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?181121-University-of-Nebraska-Medical-Center=",
+      "lastVerifiedAt": "2026-06-17"
+    },
+    "dataSource": "cached"
+  },
+  {
+    "id": "219471",
+    "name": "University of South Dakota",
+    "city": "Vermillion",
+    "state": "SD",
+    "control": "public",
+    "tuitionInState": 9069,
+    "tuitionOutOfState": 12369,
+    "netPriceByIncome": {},
+    "majors": [],
+    "source": {
+      "sourceName": "College Scorecard / NCES IPEDS 2022-23; tuition via CollegeSimply aggregated IPEDS",
+      "sourceUrl": "https://collegescorecard.ed.gov/school/?219471-University-of-South-Dakota=",
+      "lastVerifiedAt": "2026-06-17"
     },
     "dataSource": "cached"
   }

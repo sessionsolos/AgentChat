@@ -3,11 +3,12 @@
  *
  * Tests run entirely offline (no network calls). Covered:
  *   1. Mapping: raw Scorecard JSON → SchoolCost (income-band keys, ownership→control, tuition)
- *   2. Cache fallback: with no DATA_GOV_API_KEY, fetchSchoolCosts returns cached
+ *   2. institutionalAid mapping: pell_grant_rate, federal_loan_rate, avg_net_price (public vs private)
+ *   3. Cache fallback: with no DATA_GOV_API_KEY, fetchSchoolCosts returns cached
  *      records with dataSource: 'cached' and every record passes SchoolCostSchema.parse()
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { SchoolCostSchema, SchoolsRequestSchema } from "@/lib/schemas/school-cost";
 
 // ---------------------------------------------------------------------------
@@ -38,6 +39,12 @@ const RAW_SCORECARD_RESPONSE = {
       "latest.cost.net_price.private.by_income_level.48001-75000": null,
       "latest.cost.net_price.private.by_income_level.75001-110000": null,
       "latest.cost.net_price.private.by_income_level.110001-plus": null,
+      // Institutional aid fields — IPEDS PCTPELL / PCTFLOAN
+      "latest.aid.pell_grant_rate": 0.24,
+      "latest.aid.federal_loan_rate": 0.40,
+      // avg_net_price: public institution uses .public path
+      "latest.cost.avg_net_price.public": 18029,
+      "latest.cost.avg_net_price.private": null,
     },
     {
       id: 181002,
@@ -59,6 +66,12 @@ const RAW_SCORECARD_RESPONSE = {
       "latest.cost.net_price.private.by_income_level.48001-75000": 29100,
       "latest.cost.net_price.private.by_income_level.75001-110000": 33400,
       "latest.cost.net_price.private.by_income_level.110001-plus": 38624,
+      // Institutional aid — null for this fixture (tests omit behavior)
+      "latest.aid.pell_grant_rate": null,
+      "latest.aid.federal_loan_rate": null,
+      // avg_net_price: private institution uses .private path
+      "latest.cost.avg_net_price.public": null,
+      "latest.cost.avg_net_price.private": 31500,
     },
   ],
 };
@@ -69,12 +82,14 @@ const RAW_SCORECARD_RESPONSE = {
 // fetch and keeps the test fast and deterministic.
 // ---------------------------------------------------------------------------
 
+type RawSchool = (typeof RAW_SCORECARD_RESPONSE)["results"][number];
+
 /**
  * mapSchool replicates the internal mapping in scorecard.ts.
  * Keeping this inline lets us test the mapping contract without exposing the
  * internal function.
  */
-function mapSchool(raw: typeof RAW_SCORECARD_RESPONSE["results"][number]) {
+function mapSchool(raw: RawSchool) {
   const isPublic = raw["school.ownership"] === 1;
   const netPriceByIncome: Record<string, number> = {};
 
@@ -102,7 +117,23 @@ function mapSchool(raw: typeof RAW_SCORECARD_RESPONSE["results"][number]) {
     if (v4 != null) netPriceByIncome["110k+"] = v4;
   }
 
-  return {
+  // Build institutionalAid — mirrors scorecard.ts mapSchool
+  const pellRate = raw["latest.aid.pell_grant_rate"];
+  const loanRate = raw["latest.aid.federal_loan_rate"];
+  const avgNetPriceRaw = isPublic
+    ? raw["latest.cost.avg_net_price.public"]
+    : raw["latest.cost.avg_net_price.private"];
+
+  const hasAidData = pellRate != null || loanRate != null || avgNetPriceRaw != null;
+  const institutionalAid = hasAidData
+    ? {
+        ...(pellRate != null ? { pellGrantRate: pellRate } : {}),
+        ...(loanRate != null ? { federalLoanRate: loanRate } : {}),
+        ...(avgNetPriceRaw != null ? { avgNetPrice: avgNetPriceRaw } : {}),
+      }
+    : undefined;
+
+  const result: Record<string, unknown> = {
     id: String(raw.id),
     name: raw["school.name"],
     city: raw["school.city"],
@@ -118,10 +149,16 @@ function mapSchool(raw: typeof RAW_SCORECARD_RESPONSE["results"][number]) {
     },
     dataSource: "live",
   };
+
+  if (institutionalAid !== undefined) {
+    result.institutionalAid = institutionalAid;
+  }
+
+  return result;
 }
 
 // ---------------------------------------------------------------------------
-// Mapping tests
+// Mapping tests — existing coverage
 // ---------------------------------------------------------------------------
 
 describe("Scorecard raw → SchoolCost mapping", () => {
@@ -142,7 +179,7 @@ describe("Scorecard raw → SchoolCost mapping", () => {
   it("maps public net-price income bands using the public cohort keys", () => {
     const raw = RAW_SCORECARD_RESPONSE.results[0];
     const result = mapSchool(raw);
-    const np = result.netPriceByIncome;
+    const np = result.netPriceByIncome as Record<string, number>;
 
     expect(np["0-30k"]).toBe(12216);
     expect(np["30-48k"]).toBe(13508);
@@ -160,13 +197,14 @@ describe("Scorecard raw → SchoolCost mapping", () => {
   it("maps a private school using the private cohort net-price keys", () => {
     const raw = RAW_SCORECARD_RESPONSE.results[1];
     const result = mapSchool(raw);
+    const np = result.netPriceByIncome as Record<string, number>;
 
     expect(result.control).toBe("private");
-    expect(result.netPriceByIncome["0-30k"]).toBe(22534);
-    expect(result.netPriceByIncome["30-48k"]).toBe(25800);
-    expect(result.netPriceByIncome["48-75k"]).toBe(29100);
-    expect(result.netPriceByIncome["75-110k"]).toBe(33400);
-    expect(result.netPriceByIncome["110k+"]).toBe(38624);
+    expect(np["0-30k"]).toBe(22534);
+    expect(np["30-48k"]).toBe(25800);
+    expect(np["48-75k"]).toBe(29100);
+    expect(np["75-110k"]).toBe(33400);
+    expect(np["110k+"]).toBe(38624);
   });
 
   it("maps school.ownership=2 (private nonprofit) to control='private'", () => {
@@ -195,12 +233,13 @@ describe("Scorecard raw → SchoolCost mapping", () => {
       ...RAW_SCORECARD_RESPONSE.results[0],
       "latest.cost.net_price.public.by_income_level.30001-48000": null,
       "latest.cost.net_price.public.by_income_level.75001-110000": null,
-    } as unknown as typeof RAW_SCORECARD_RESPONSE["results"][number];
+    } as unknown as RawSchool;
     const result = mapSchool(rawPartial);
-    expect(result.netPriceByIncome["30-48k"]).toBeUndefined();
-    expect(result.netPriceByIncome["75-110k"]).toBeUndefined();
+    const np = result.netPriceByIncome as Record<string, number | undefined>;
+    expect(np["30-48k"]).toBeUndefined();
+    expect(np["75-110k"]).toBeUndefined();
     // The bands that were not null should still be present
-    expect(result.netPriceByIncome["0-30k"]).toBe(12216);
+    expect(np["0-30k"]).toBe(12216);
   });
 
   it("handles missing tuition fields (null) by omitting them", () => {
@@ -208,11 +247,85 @@ describe("Scorecard raw → SchoolCost mapping", () => {
       ...RAW_SCORECARD_RESPONSE.results[0],
       "latest.cost.tuition.in_state": null,
       "latest.cost.tuition.out_of_state": null,
-    } as unknown as typeof RAW_SCORECARD_RESPONSE["results"][number];
+    } as unknown as RawSchool;
     const result = mapSchool(rawNoTuition);
     expect(result.tuitionInState).toBeUndefined();
     expect(result.tuitionOutOfState).toBeUndefined();
     // Schema should still parse since these are optional
+    expect(() => SchoolCostSchema.parse(result)).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// institutionalAid mapping tests (new)
+// ---------------------------------------------------------------------------
+
+describe("Scorecard raw → SchoolCost institutionalAid mapping", () => {
+  it("maps pell_grant_rate and federal_loan_rate for a public school", () => {
+    const raw = RAW_SCORECARD_RESPONSE.results[0]; // public, has rates
+    const result = mapSchool(raw);
+    const aid = result.institutionalAid as Record<string, number> | undefined;
+
+    expect(aid).toBeDefined();
+    expect(aid!.pellGrantRate).toBeCloseTo(0.24);
+    expect(aid!.federalLoanRate).toBeCloseTo(0.40);
+  });
+
+  it("uses latest.cost.avg_net_price.public for public institutions", () => {
+    const raw = RAW_SCORECARD_RESPONSE.results[0]; // public
+    const result = mapSchool(raw);
+    const aid = result.institutionalAid as Record<string, number> | undefined;
+
+    expect(aid).toBeDefined();
+    expect(aid!.avgNetPrice).toBe(18029);
+  });
+
+  it("uses latest.cost.avg_net_price.private for private institutions", () => {
+    const raw = RAW_SCORECARD_RESPONSE.results[1]; // private, null pell/loan, has private avg
+    const result = mapSchool(raw);
+    const aid = result.institutionalAid as Record<string, number> | undefined;
+
+    expect(aid).toBeDefined();
+    expect(aid!.avgNetPrice).toBe(31500);
+  });
+
+  it("omits institutionalAid entirely when all aid fields are null", () => {
+    const rawNoAid = {
+      ...RAW_SCORECARD_RESPONSE.results[0],
+      "latest.aid.pell_grant_rate": null,
+      "latest.aid.federal_loan_rate": null,
+      "latest.cost.avg_net_price.public": null,
+      "latest.cost.avg_net_price.private": null,
+    } as unknown as RawSchool;
+    const result = mapSchool(rawNoAid);
+    expect(result.institutionalAid).toBeUndefined();
+  });
+
+  it("omits pellGrantRate key when null, but keeps federalLoanRate when present", () => {
+    const rawPartialAid = {
+      ...RAW_SCORECARD_RESPONSE.results[0],
+      "latest.aid.pell_grant_rate": null,
+      "latest.aid.federal_loan_rate": 0.35,
+      "latest.cost.avg_net_price.public": null,
+    } as unknown as RawSchool;
+    const result = mapSchool(rawPartialAid);
+    const aid = result.institutionalAid as Record<string, number | undefined> | undefined;
+
+    expect(aid).toBeDefined();
+    expect(aid!.pellGrantRate).toBeUndefined();
+    expect(aid!.federalLoanRate).toBeCloseTo(0.35);
+    expect(aid!.avgNetPrice).toBeUndefined();
+  });
+
+  it("public school with institutionalAid passes SchoolCostSchema.parse()", () => {
+    const raw = RAW_SCORECARD_RESPONSE.results[0];
+    const result = mapSchool(raw);
+    expect(() => SchoolCostSchema.parse(result)).not.toThrow();
+  });
+
+  it("private school with only avgNetPrice passes SchoolCostSchema.parse()", () => {
+    const raw = RAW_SCORECARD_RESPONSE.results[1];
+    const result = mapSchool(raw);
     expect(() => SchoolCostSchema.parse(result)).not.toThrow();
   });
 });
@@ -276,15 +389,23 @@ describe("fetchSchoolCosts — cache fallback", () => {
     const schools = await fetchSchoolCosts(req);
 
     const states = new Set(schools.map((s) => s.state));
-    // Should include at least one non-NE state (IA, KS, MO, SD are in the cache)
+    // Should include at least one non-NE state (IA, KS, MO, SD, OH, MI etc. are in the cache)
     expect(states.size).toBeGreaterThan(1);
   });
 
-  it("SchoolsRequestSchema rejects a missing state", () => {
+  it("SchoolsRequestSchema rejects a missing state (no ids either)", () => {
     expect(() => SchoolsRequestSchema.parse({})).toThrow();
+  });
+
+  it("SchoolsRequestSchema accepts ids without state", () => {
+    expect(() => SchoolsRequestSchema.parse({ ids: ["181464"] })).not.toThrow();
   });
 
   it("SchoolsRequestSchema rejects a state longer than 2 characters", () => {
     expect(() => SchoolsRequestSchema.parse({ state: "NEB" })).toThrow();
+  });
+
+  it("SchoolsRequestSchema rejects empty ids with no state", () => {
+    expect(() => SchoolsRequestSchema.parse({ ids: [] })).toThrow();
   });
 });
