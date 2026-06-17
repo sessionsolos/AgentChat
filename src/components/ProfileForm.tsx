@@ -292,6 +292,14 @@ export function ProfileForm() {
     | { status: "error"; message: string }
   >({ status: "idle" });
 
+  // Selected-schools panel state — fires in parallel when targetSchools are set
+  const [selectedSchoolsState, setSelectedSchoolsState] = useState<
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "success"; data: SchoolsResponse; incomeBand: IncomeBand | undefined }
+    | { status: "error"; message: string }
+  >({ status: "idle" });
+
   const set = (key: keyof FormState) => (value: FormState[typeof key]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -317,11 +325,18 @@ export function ProfileForm() {
     }
 
     const profile: StudentProfile = parsed.data;
+    const hasTargetSchools =
+      profile.targetSchoolIds != null && profile.targetSchoolIds.length > 0;
 
     setApiState({ status: "loading" });
     setSchoolsState({ status: "loading" });
+    if (hasTargetSchools) {
+      setSelectedSchoolsState({ status: "loading" });
+    } else {
+      setSelectedSchoolsState({ status: "idle" });
+    }
 
-    // Fire both requests in parallel
+    // Fire all requests in parallel
     const matchPromise = fetch("/api/match", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -338,6 +353,40 @@ export function ProfileForm() {
         includeOutOfState: true,
       }),
     });
+
+    // Fire selected-schools fetch in parallel when ids are present
+    if (hasTargetSchools) {
+      fetch("/api/schools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ids: profile.targetSchoolIds,
+          incomeBand: profile.householdIncomeBand,
+        }),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            const msg =
+              (body as { error?: string }).error ??
+              `Could not load selected school data (${res.status}).`;
+            setSelectedSchoolsState({ status: "error", message: msg });
+            return;
+          }
+          const data = (await res.json()) as SchoolsResponse;
+          setSelectedSchoolsState({
+            status: "success",
+            data,
+            incomeBand: profile.householdIncomeBand,
+          });
+        })
+        .catch(() => {
+          setSelectedSchoolsState({
+            status: "error",
+            message: "Network error loading selected school data — please try again.",
+          });
+        });
+    }
 
     // Handle /api/match response
     matchPromise
@@ -658,6 +707,28 @@ export function ProfileForm() {
           </FullWidthField>
         </FormSection>
 
+        {/* ── Schools You're Interested In (optional) ── */}
+        <FormSection
+          title="Schools You're Interested In"
+          description="Optional — add up to 3 schools to see their net price, aid stats, and any school-specific scholarships you might stack."
+        >
+          <FullWidthField>
+            <div>
+              <p className="block text-sm font-medium text-gray-700 mb-1">
+                Schools{" "}
+                <span className="text-xs font-normal text-gray-400">
+                  (optional, up to 3)
+                </span>
+              </p>
+              <SchoolSearchPicker
+                selected={form.targetSchools}
+                onChange={set("targetSchools") as (v: SelectedSchool[]) => void}
+                max={3}
+              />
+            </div>
+          </FullWidthField>
+        </FormSection>
+
         {/* ── Activities & Achievements ── */}
         <FormSection
           title="Activities & Achievements"
@@ -842,6 +913,25 @@ export function ProfileForm() {
       {/* Results */}
       {apiState.status === "success" && (
         <div id="results-section" className="space-y-16">
+          {/* Your Selected Schools panel — shown first when schools are selected */}
+          {selectedSchoolsState.status !== "idle" && (
+            <SelectedSchoolsPanel
+              state={
+                selectedSchoolsState.status === "loading"
+                  ? { status: "loading" }
+                  : selectedSchoolsState.status === "error"
+                  ? { status: "error", message: selectedSchoolsState.message }
+                  : { status: "success", data: selectedSchoolsState.data }
+              }
+              incomeBand={
+                selectedSchoolsState.status === "success"
+                  ? selectedSchoolsState.incomeBand
+                  : undefined
+              }
+              matchResults={apiState.data.results}
+            />
+          )}
+
           <ResultsPanel
             results={apiState.data.results}
             generatedAt={apiState.data.meta.generatedAt}
